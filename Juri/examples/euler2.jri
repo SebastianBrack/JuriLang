@@ -1,0 +1,15 @@
+﻿n1=0
+n2=1
+s=0
+
+if n1 < 4000000 repeat
+    if 0 == n1%2
+        s=s+n1
+        
+    nth = n1 + n2
+    n1 = n2
+    n2 = nth
+
+printn(s)
+
+    

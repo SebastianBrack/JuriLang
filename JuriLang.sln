@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Juri", "Juri\Juri.fsproj", "{DA62DC58-585E-4B40-B990-62392A928EB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebInterpreter", "WebInterpreter\WebInterpreter.csproj", "{C5728AE5-7064-4AEE-9DC5-8006CBD644DC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DA62DC58-585E-4B40-B990-62392A928EB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA62DC58-585E-4B40-B990-62392A928EB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA62DC58-585E-4B40-B990-62392A928EB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA62DC58-585E-4B40-B990-62392A928EB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5728AE5-7064-4AEE-9DC5-8006CBD644DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5728AE5-7064-4AEE-9DC5-8006CBD644DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5728AE5-7064-4AEE-9DC5-8006CBD644DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5728AE5-7064-4AEE-9DC5-8006CBD644DC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
