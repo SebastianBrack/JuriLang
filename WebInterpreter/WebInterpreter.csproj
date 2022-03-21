@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web" TreatAsLocalProperty="SelfContained">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
