@@ -29,7 +29,7 @@ type ProvidedFunction =
 and EnvironmentObject =
     | Variable of float
     | List of float array
-    | CustomFunction of expectedArguments: Identifier list * functionBody: JuriProgram
+    | CustomFunction of expectedArguments: Parameter list * functionBody: JuriProgram
     | ProvidedFunction of ProvidedFunction
 
 
