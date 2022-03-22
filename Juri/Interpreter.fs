@@ -318,6 +318,25 @@ and private evalListAccess
         then Ok list[trueIndex]
         else Error $"Der Index {index} liegt ausserhalb des Umfangs der Liste."
 
+
+
+and private checkFunctionSignature
+        (outputWriter: IOutputWriter)
+        (state: ComputationState)
+        (expectedArgs: Parameter list)
+        (givenArgs: GivenArgument list) =
+    let matchesType expected given =
+        match expected, given with
+        | ValueArgument _, Value _ -> Ok ()
+        | ListPointer _, Pointer _ -> Ok ()
+        | ValueArgument _, Pointer _ -> Error "Hier wird ein berechenbarer Wert erwartet aber es wurde ein Pointer übergeben."
+        | ListPointer _, Value _ -> Error "Hier wird ein Pointer erwartet aber es wurde ein Wert übergeben."
+    if expectedArgs.Length <> givenArgs.Length then
+        Error $"Diese Funktion erwartet %i{expectedArgs.Length} Argumente - es wurden aber %i{givenArgs.Length} übergeben."
+    else
+        
+
+
 and private evalList
         (expList: Expression list)
         (outputWriter: IOutputWriter)
@@ -337,10 +356,10 @@ and private evalCustomFunction
         (argNames, body)
         (outputWriter: IOutputWriter)
         (state: ComputationState)
-        (args: float list) : InterpreterResult<float> =
+        (args: Parameter list) : InterpreterResult<float> =
     let env = state.Environment
     if argNames.Length <> args.Length then
-        Error (sprintf "Diese Funktion erwarte %i Argumente - es wurden aber %i übergeben." argNames.Length args.Length)
+        Error $"Diese Funktion erwartet %i{argNames.Length} Argumente - es wurden aber %i{args.Length} übergeben."
     else
         let functionFilter _ = function | CustomFunction _ | ProvidedFunction _ -> true | _ -> false
         let scopedVariables = args |> List.map Variable |> List.zip argNames
