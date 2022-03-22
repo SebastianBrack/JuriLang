@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="../Juri/ParserCombinators.fs" />
+        <Compile Include="../Juri/LanguageModel.fs" />
+        <Compile Include="../Juri/JuriOutput.fs" />
+        <Compile Include="../Juri/JuriOutputWriter.fs" />
+        <Compile Include="../Juri/Runtime.fs" />
+        <Compile Include="../Juri/CoreLib.fs" />
+        <Compile Include="../Juri/Interpreter.fs" />
+        <Compile Include="../Juri/Parser.fs" />
+        <Compile Include="../Juri/Preprocessor.fs" />
+        <Compile Include="../Juri/Repl.fs" />
+        <Compile Include="../Juri/CLI.fs" />
+        <Compile Include="../Juri/JuriInterpreter.fs" />
+        <Compile Include="../Juri/Program.fs" />
+    </ItemGroup>
+    
+</Project>
