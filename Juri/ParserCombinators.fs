@@ -448,10 +448,10 @@ let createNewline<'c> () =
         let pos = stream.GetPosition()
         if stream.HasNext then
             let nextc = stream.Next
-            if nextc = '\n' || nextc = '\r' || nextc = '\u0085' || nextc = '\u2029' || nextc = '\uffff' then
-                Success ((), c, pos + 1)
-            elif stream.HasNextN(2) && stream.NextN(2) = [|'\r'; '\n'|] then
+            if stream.HasNextN(2) && stream.NextN(2) = [|'\r'; '\n'|] then
                 Success ((), c, pos + 2)
+            elif nextc = '\n' || nextc = '\r' || nextc = '\u0085' || nextc = '\u2029' || nextc = '\uffff' then
+                Success ((), c, pos + 1)
             else
                 Failure ("Expected a new line.", None)
         else
