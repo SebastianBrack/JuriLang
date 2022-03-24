@@ -297,6 +297,11 @@ let emptyLines =
         ws >>. newline
         |>> ignore
     many (either commentLine empty)
+    
+let singleLineStatementEnding parser =
+    parser
+    ||>> addThisLineToResult
+    .>> newlineEOS .>> emptyLines
 
 
 
@@ -357,8 +362,8 @@ let private codeblock =
 
 let private instructionExpression =
     expression
-    .>> newlineEOS .>> emptyLines
     |>> Expression
+    |> singleLineStatementEnding
 
 
 
@@ -366,8 +371,8 @@ let private assignment =
     identifier
     .>> eq
     .>>. (expression |> failAsFatal)
-    .>> newlineEOS .>> emptyLines
     |>> fun (id, exp) -> Assignment (id, exp)
+    |> singleLineStatementEnding
 
 
 
@@ -375,8 +380,8 @@ let private listAssignment =
     listIdentifier
     .>> eq
     .>>. (openBracket >>. (many expression) .>> closingBracket)
-    .>> newlineEOS .>> emptyLines
     |>> ListAssignment
+    |> singleLineStatementEnding
     
     
     
@@ -384,8 +389,8 @@ let private listAssignmentWithRange = // has to be tried before listAssignment i
     listIdentifier
     .>> eq
     .>>. (openBracket >>. expression .>> rangeOperator .>>. expression .>> closingBracket)
-    .>> newlineEOS .>> emptyLines
     |>> fun (id, (lowerBound, upperBound)) -> ListAssignmentWithRange (id, lowerBound, upperBound)
+    |> singleLineStatementEnding
     
     
     
@@ -409,8 +414,8 @@ let private listInitialisationWithValue =
     .>> jinit
     .>>. (expression |> failAsFatal)
     .>>. (expression |> failAsFatal)
-    .>> newlineEOS .>> emptyLines
     |>> fun ((id, size), value) -> ListInitialisationWithValue (id, size, value)
+    |> singleLineStatementEnding
 
 
 
@@ -419,8 +424,8 @@ let private listElementAssignment =
     .>>. listIdentifier
     .>> eq
     .>>. (expression |> failAsFatal)
-    .>> newlineEOS .>> emptyLines
     |>> fun ((index, id), exp) -> ListElementAssignment (id, index, exp)
+    |> singleLineStatementEnding
 
 
 
@@ -476,39 +481,41 @@ let private conditionWithSingleStatement = // has to be parsed before loop
     .>> jthen
     .>>. (instruction |> failAsFatal)
     |>> fun (con, statement) -> Loop (con, false, [statement])
+    |> singleLineStatementEnding
 
 
 
 let private breakStatement =
     jbreak
-    .>> newlineEOS .>> emptyLines
     |>> (fun _ -> Break)
+    |> singleLineStatementEnding
     
 
 
 let private returnStatement =
     jreturn
     >>. (expression |> failAsFatal)
-    .>> newlineEOS .>> emptyLines
     |>> Return
-
+    |> singleLineStatementEnding
 
 
 instructionImpl.Value <-
-    [   binaryOperatorDefinition
-        conditionWithSingleStatement ||>> addLastLineToResult
+    [
+        binaryOperatorDefinition
+        conditionWithSingleStatement 
         loop
         functionDefinition
-        assignment ||>> addLastLineToResult
-        listAssignmentWithRange ||>> addLastLineToResult
-        listAssignment ||>> addLastLineToResult
+        assignment 
+        listAssignmentWithRange 
+        listAssignment 
         listInitialisationWithCode
-        listInitialisationWithValue ||>> addLastLineToResult
-        listElementAssignment ||>> addLastLineToResult
+        listInitialisationWithValue 
+        listElementAssignment 
         listIteration
-        breakStatement ||>> addLastLineToResult
-        returnStatement ||>> addLastLineToResult
-        instructionExpression ||>> addLastLineToResult ]
+        breakStatement 
+        returnStatement 
+        instructionExpression
+    ]
     |> choice
 
 
