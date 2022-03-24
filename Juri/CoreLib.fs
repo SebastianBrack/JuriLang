@@ -30,34 +30,38 @@ let private buildinInBoundarys : ProvidedFunction =
 
 let private buildinPrint : ProvidedFunction =
     fun out args ->
-        let outputString =
-            args
-            |> List.map (fun x -> sprintf "%f " x)
-            |> String.Concat
-            |> sprintf "%s"
-        out.WriteSTD(outputString)
+        args
+        |> List.map (fun x -> $"{x} ")
+        |> String.Concat
+        |> out.WriteSTD
         Ok 0.
-
+        
 let private buildinPrintNewline : ProvidedFunction =
+    let join separator a b = a + separator + b
     fun out args ->
-        let outputString =
-            args
-            |> List.map (fun x -> sprintf "%f " x)
-            |> String.Concat
-            |> sprintf "%s\n"
-        out.WriteSTD(outputString)
-        Ok 0.        
+        args
+        |> List.map (fun x -> $"{x}")
+        |> List.reduce (join " ")
+        |> sprintf "%s\n"
+        |> out.WriteSTD
+        Ok 0.
 
 let private buildinPrintChar : ProvidedFunction =
     fun out args ->
-        let outputString =
-            args
-            |> List.map (fun x -> x |> int |> char)
-            |> String.Concat
-            |> sprintf "%s\n"
-        out.WriteSTD(outputString)
+        args
+        |> List.map (fun x -> x |> int |> char)
+        |> String.Concat
+        |> out.WriteSTD
         Ok 0.
 
+let private buildinPrintCharNewline : ProvidedFunction =
+    fun out args ->
+        args
+        |> List.map (fun x -> x |> int |> char)
+        |> String.Concat
+        |> sprintf "%s\n"
+        |> out.WriteSTD
+        Ok 0.
 
 let private buildinInput : ProvidedFunction =
     fun _ args ->
@@ -225,6 +229,7 @@ let createEnvWithCoreLibFunctions () : Environment =
         (Identifier "print", ProvidedFunction buildinPrint)
         (Identifier "printn", ProvidedFunction buildinPrintNewline)
         (Identifier "printc", ProvidedFunction buildinPrintChar)
+        (Identifier "printcn", ProvidedFunction buildinPrintCharNewline)
         (Identifier "input", ProvidedFunction buildinInput)
         (Identifier "rand", ProvidedFunction buildinRandom)
         (Identifier "quickmath", ProvidedFunction buildinQuickMath)

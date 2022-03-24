@@ -175,6 +175,13 @@ let private singleExpression, singleExpressionImpl = createParserForwarder ()
 
 
 
+// parameter
+let private parameter =
+    let listReference = listIdentifier |>> Pointer
+    let value = expression |>> Value
+    either listReference value
+
+
 let private number = 
 
     let punctuation = pchar '.'
@@ -201,14 +208,8 @@ let private variableReference =
 
 
 
-//let private listReference =
-//    listIdentifier
-//    |>> ListReference
-
-
-
 let private functionCall =
-    identifier .>> openParen .>>. (many expression)
+    identifier .>> openParen .>>. (many parameter)
     .>> (closingParen |> failAsFatal)
     |>> FunctionCall
 
@@ -271,6 +272,14 @@ expressionImpl.Value <-
 //let private listLiteral = 
 //   openBracket >>. (many expression) .>> closingBracket
 //    |>> LiteralList
+
+
+
+// argument
+let argument =
+    let valueArgument = identifier |>> ValueArgument
+    let listPointer = listIdentifier |>> ListPointer
+    either listPointer valueArgument
 
 
 
@@ -430,7 +439,7 @@ let private listIteration =
 let private functionDefinition =
     jfun
     >>. (identifier |> failAsFatal)
-    .>>. ((many1 identifier) |> failAsFatal)
+    .>>. ((many argument) |> failAsFatal)
     ||>> addThisLineToResult
     .>> newline .>> emptyLines
     .>>. (codeblock |> failAsFatal)
@@ -441,8 +450,8 @@ let private functionDefinition =
 let private binaryOperatorDefinition =
     binary
     >>. (operator |> failAsFatal)
-    .>>. (identifier |> failAsFatal)
-    .>>. (identifier |> failAsFatal)
+    .>>. (argument |> failAsFatal)
+    .>>. (argument |> failAsFatal)
     ||>> addThisLineToResult
     .>> newline .>> emptyLines
     .>>. (codeblock |> failAsFatal)
