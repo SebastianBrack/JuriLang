@@ -1,15 +1,52 @@
 module Juri.Internal.Interpreter
 
 open System
+open Juri.Internal.LanguageModel
 open Juri.Internal.OutputWriter
-open LanguageModel
+open Juri.Internal.Runtime
 open Runtime
 
 
 
 // helper functions
+let private prependToList xs x = x::xs
+let private appendToList xs x = xs@[x]
+let private dropResults xs x = ()
+
+let private accumulateResults accumulationStrategy results elem =
+    match results, elem with
+    | Ok _, Error msg -> Error msg
+    | Error msg, Error msg2 -> Error (msg + " " + msg2)
+    | Error msg, Ok _ -> Error msg
+    | Ok xs, Ok x -> Ok (accumulationStrategy xs x)
 
 
+let private checkFunctionSignature
+        (expectedArgs: Parameter list)
+        (givenArgs: GivenArgument list) =
+    let matchesType expected given =
+        match expected, given with
+        | ValueArgument _, Value _ -> Ok ()
+        | ListPointer _, Pointer _ -> Ok ()
+        | ValueArgument id, Pointer _ -> Error $"Parameter {id} -> übergeben: Pointer - erwartet: einen berechenbaren Wert!"
+        | ListPointer id, Value _ -> Error $"Parameter {id} -> übergeben: berechenbarer Wert - erwartet: Pointer!"
+    if expectedArgs.Length <> givenArgs.Length then
+        Error $"Diese Funktion erwartet %i{expectedArgs.Length} Argumente - es wurden aber %i{givenArgs.Length} übergeben."
+    else
+        List.map2 matchesType expectedArgs givenArgs
+        |> List.reduce (accumulateResults dropResults)
+        
+        
+let private checkArgumentsAreOnlyValues args : InterpreterResult<Expression list> =
+    let checker = function
+        | Value expression -> Ok expression
+        | Pointer id -> Error $"{id} ist eine Referenz auf eine Liste. Es wird aber ein Wert erwartet."
+    args
+    |> List.map checker
+    |> List.fold (accumulateResults appendToList) (Ok [])
+
+
+// computation and evaluation -------------
 let rec private computeLoop
         (con: Expression)
         (rep: bool)
@@ -54,7 +91,7 @@ and private computeListAssignment
         Ok {state with LastExpression = None; Environment = newEnv}
     match (env.TryFind id) with
     | None | Some (List _) ->
-        evalList expressions outputWriter state
+        evalList outputWriter state expressions 
         >>= addListToState
     | _ -> Error $"{id} ist keine Liste und kann keine entsprechenden Werte zugewiesen bekommen."
     
@@ -285,21 +322,20 @@ and private eval
     | FunctionCall (id, args) ->
         match (Map.tryFind id env) with
         | Some (ProvidedFunction f) ->
-            evalList args outputWriter state
+            checkArgumentsAreOnlyValues args
+            >>= evalList outputWriter state
             >>= (f outputWriter)
         | Some (CustomFunction (argNames, body)) ->
-            evalList args outputWriter state
-            >>= evalCustomFunction (argNames, body) outputWriter state
+            evalCustomFunction (argNames, body) args outputWriter state
         | Some _ -> Error $"{id} ist keine Funktion."
         | None -> Error $"Der Verweis auf %A{id} konnte nicht aufgelöst werden."
     | Binary (BinaryOperator op, left, right) ->
         match (Map.tryFind (Identifier op) env) with
         | Some (ProvidedFunction f) ->
-            evalList [left;right] outputWriter state
+            evalList outputWriter state [left;right]
             >>= (f outputWriter)
         | Some (CustomFunction (argNames, body)) ->
-            evalList [left;right] outputWriter state
-            >>= (evalCustomFunction (argNames, body) outputWriter state)
+            evalCustomFunction (argNames, body) [Value left; Value right] outputWriter state
         | Some _ -> Error $"{id} ist kein Operator."
         | None -> Error $"Der Operator %A{op} ist nicht definiert"
     | ParenthesizedExpression expression ->
@@ -319,59 +355,55 @@ and private evalListAccess
         else Error $"Der Index {index} liegt ausserhalb des Umfangs der Liste."
 
 
-
-and private checkFunctionSignature
-        (outputWriter: IOutputWriter)
-        (state: ComputationState)
-        (expectedArgs: Parameter list)
-        (givenArgs: GivenArgument list) =
-    let matchesType expected given =
-        match expected, given with
-        | ValueArgument _, Value _ -> Ok ()
-        | ListPointer _, Pointer _ -> Ok ()
-        | ValueArgument _, Pointer _ -> Error "Hier wird ein berechenbarer Wert erwartet aber es wurde ein Pointer übergeben."
-        | ListPointer _, Value _ -> Error "Hier wird ein Pointer erwartet aber es wurde ein Wert übergeben."
-    if expectedArgs.Length <> givenArgs.Length then
-        Error $"Diese Funktion erwartet %i{expectedArgs.Length} Argumente - es wurden aber %i{givenArgs.Length} übergeben."
-    else
-        
-
-
 and private evalList
-        (expList: Expression list)
         (outputWriter: IOutputWriter)
-        (state: ComputationState) : InterpreterResult<float list> =
+        (state: ComputationState) 
+        (expList: Expression list) : InterpreterResult<float list> =
     
-    let appender results elem =
-        match results, elem with
-        | Error _, _ -> results
-        | Ok _, Error e -> Error e
-        | Ok xs, Ok x -> Ok (xs @ [x])
     expList
     |> List.map (eval outputWriter state)
-    |> List.fold appender (Ok [])
+    |> List.fold (accumulateResults appendToList) (Ok [])
 
 
 and private evalCustomFunction
-        (argNames, body)
+        (parameter, body)
+        (givenArgs : GivenArgument list)
         (outputWriter: IOutputWriter)
-        (state: ComputationState)
-        (args: Parameter list) : InterpreterResult<float> =
+        (state: ComputationState) : InterpreterResult<float> =
     let env = state.Environment
-    if argNames.Length <> args.Length then
-        Error $"Diese Funktion erwartet %i{argNames.Length} Argumente - es wurden aber %i{args.Length} übergeben."
-    else
+    match checkFunctionSignature parameter givenArgs with
+    | Error msg -> Error msg
+    | Ok () ->
         let functionFilter _ = function | CustomFunction _ | ProvidedFunction _ -> true | _ -> false
-        let scopedVariables = args |> List.map Variable |> List.zip argNames
-        let scopedFunctions = env |> Map.filter functionFilter |> Map.toList
-        let functionEnv = Map (scopedVariables @ scopedFunctions)
-        let functionComputationState = {
-            LastExpression = None
-            Environment = functionEnv
-            BreakFlag = false
-            ReturnFlag = false }
-        let returnValue = compute body outputWriter functionComputationState
-        match returnValue with
-        | Error e -> Error e
-        | Ok {LastExpression = None} -> Error "Die Funktion hat keinen Wert zurückgegeben"
-        | Ok {LastExpression = Some x} -> Ok x
+        let argumentMapper = function
+            | Pointer id ->
+                match Map.tryFind id env with
+                | Some (List ns) -> Ok (List ns)
+                | _ -> Error $"{id} verweist auf eine nicht Existierende Liste."
+            | Value expression ->
+                match eval outputWriter state expression with
+                | Ok x -> Ok (Variable x)
+                | Error msg -> Error msg
+                
+        let evaluatedParams =
+            givenArgs
+            |> List.map argumentMapper
+            |> List.fold (accumulateResults prependToList) (Ok [])
+            
+        match evaluatedParams with
+        | Error msg -> Error msg
+        | Ok args ->
+            let parameterNames = parameter |> List.map (function |ValueArgument id -> id |ListPointer id -> id)
+            let scopedVariables = args |> List.zip parameterNames
+            let scopedFunctions = env |> Map.filter functionFilter |> Map.toList
+            let functionEnv = Map (scopedVariables @ scopedFunctions)
+            let functionComputationState = {
+                LastExpression = None
+                Environment = functionEnv
+                BreakFlag = false
+                ReturnFlag = false }
+            let returnValue = compute body outputWriter functionComputationState
+            match returnValue with
+            | Error e -> Error e
+            | Ok {LastExpression = None} -> Error "Die Funktion hat keinen Wert zurückgegeben"
+            | Ok {LastExpression = Some x} -> Ok x
