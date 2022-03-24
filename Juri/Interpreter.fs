@@ -388,7 +388,7 @@ and private evalCustomFunction
         let evaluatedParams =
             givenArgs
             |> List.map argumentMapper
-            |> List.fold (accumulateResults prependToList) (Ok [])
+            |> List.fold (accumulateResults appendToList) (Ok [])
             
         match evaluatedParams with
         | Error msg -> Error msg
