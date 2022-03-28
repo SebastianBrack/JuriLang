@@ -13,20 +13,22 @@ open Preprocessor
             
 
 let private runScript (script: string) =
-  
-    
     let outputWriter : IOutputWriter = ConsoleWriter()
-    
     match processImports (script+"\n") outputWriter with
         | Error _ -> 0
-        | Ok (state,steam) -> 
-            match steam.RunParser(juriProgram)  with
+        | Ok (state,stream) -> 
+            match stream.RunParser(juriProgram)  with
             | Success (r,_,_) -> 
                 compute r outputWriter state
                 |> ignore
                 0
-            | Failure _ -> 0
-            | Fatal _ -> 0
+            | Failure (msg, _) ->
+                outputWriter.WriteERR(msg, stream.GetContext().Line)
+                0
+            | Fatal (msg, _) -> 
+                outputWriter.WriteERR(msg, stream.GetContext().Line)
+                0
+
 
 let run argv =
     match argv with
