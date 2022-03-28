@@ -291,7 +291,7 @@ let addThisLineToResult inst context = inst, context.Line
 
 let emptyLines =
     let commentLine =
-        ws >>. pchar '#' .>> (AsUntilB (anyChar()) newlineEOS)
+        ws >>. pchar '#' .>> (AsUntilB (anyChar()) newline)
         |>> ignore
     let empty =
         ws >>. newline
@@ -301,7 +301,7 @@ let emptyLines =
 let singleLineStatementEnding parser =
     parser
     ||>> addThisLineToResult
-    .>> newlineEOS .>> emptyLines
+    .>> newline .>> emptyLines
 
 
 
@@ -524,7 +524,7 @@ let juriProgram=
     emptyLines
     >>. many1 instruction
     .>> emptyLines
-    .>> EOS
+    .>> (EOS |> failAsFatal)
 
 
 
