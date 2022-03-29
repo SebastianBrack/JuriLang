@@ -292,7 +292,7 @@ let addThisLineToResult inst context = inst, context.Line
 
 let emptyLines =
     let commentLine =
-        ws >>. pchar '#' .>> (AsUntilB (anyChar()) newline)
+        ws >>. pchar '#' .>> (AsUntilB (anyChar()) newlineEOS)
         |>> ignore
     let empty =
         ws >>. newline
@@ -302,7 +302,7 @@ let emptyLines =
 let singleLineStatementEnding parser =
     parser
     ||>> addThisLineToResult
-    .>> newline .>> emptyLines
+    .>> newlineEOS .>> emptyLines
 
 
 
