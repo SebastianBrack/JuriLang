@@ -482,7 +482,7 @@ let private conditionWithSingleStatement = // has to be parsed before loop
     .>> jthen
     .>>. (instruction |> failAsFatal)
     |>> fun (con, statement) -> Loop (con, false, [statement])
-    |> singleLineStatementEnding
+    ||>> addLastLineToResult
 
 
 
