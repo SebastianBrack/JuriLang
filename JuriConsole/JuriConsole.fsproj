@@ -19,6 +19,18 @@
         <Compile Include="../Juri/CLI.fs" />
         <Compile Include="../Juri/JuriInterpreter.fs" />
         <Compile Include="../Juri/Program.fs" />
+        <Content Include="examples\euler\euler9.jri" />
+        <Content Include="examples\euler\euler6.jri" />
+        <Content Include="examples\euler\euler2.jri" />
+        <Content Include="examples\euler\euler1.jri" />
+        <Content Include="examples\quicksort_with_binsearch.jri" />
+        <Content Include="examples\quicksort.jri" />
+        <Content Include="examples\primesieve.jri" />
+        <Content Include="examples\pointer.jri" />
+        <Content Include="examples\fizzbuzz.jri" />
+        <Content Include="examples\examples.toc" />
+        <Content Include="examples\binarysearch.jri" />
+        <Content Include="examples\basicarraymodification.jri" />
     </ItemGroup>
     
 </Project>
