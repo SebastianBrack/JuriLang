@@ -16,11 +16,16 @@ type Expression =
     
 and GivenArgument =
     | Value of Expression
-    | Pointer of Identifier
+    | Pointer of ListExpression
+    
+and ListExpression =
+    | LiteralList of Expression list
+    | Range of lower: Expression * upper: Expression
+    | ListReference of Identifier
     
 type Parameter =
     | ValueArgument of Identifier
-    | ListPointer of Identifier
+    | PointerArgument of Identifier
 
 type Instruction =
     | Expression of Expression
@@ -32,7 +37,7 @@ type Instruction =
     | ListElementAssignment of  listName: Identifier * index: Expression * value: Expression
     | FunctionDefinition of functionName: Identifier * arguments: Parameter list * functionBody: JuriProgram
     | Loop of condition: Expression * repeat: bool * loopBody: JuriProgram
-    | Iteration of list: Identifier * elementName: Identifier * loopBody: JuriProgram
+    | Iteration of list: ListExpression * elementName: Identifier * loopBody: JuriProgram
     | OperatorDefinition of operator: BinaryOperator * leftArg: Parameter * rightArg: Parameter * functionBody: JuriProgram
     | Break
     | Return of Expression
