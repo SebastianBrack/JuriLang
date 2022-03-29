@@ -162,7 +162,7 @@ iterate :nums as x
 ```
 
 
->*schaut gerne im JuriCosole/examples Ordner vorbei, dort findet ihr ein paar Programme die Juri geschrieben sind :)*
+>*schaut gerne im JuriConsole/examples Ordner vorbei, dort findet ihr ein paar Programme die Juri geschrieben sind :)*
 ___
 
 	
