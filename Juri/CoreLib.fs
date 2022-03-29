@@ -210,6 +210,12 @@ let private modulo : ProvidedFunction =
         | [l; r] -> Ok (l % r)
         | _      -> argError args.Length
 
+let private intDivision : ProvidedFunction =
+    fun _ args ->
+        match args with
+        | [l; r] -> (l/ r) |> int |> float |> Ok
+        | _      -> argError args.Length
+
 let private pow : ProvidedFunction =
     fun _ args ->
         match args with
@@ -244,6 +250,7 @@ let createEnvWithCoreLibFunctions () : Environment =
         (Identifier "<=", ProvidedFunction lesserEquals)
         (Identifier ">=", ProvidedFunction greaterEquals)
         (Identifier "%", ProvidedFunction modulo)
+        (Identifier "//", ProvidedFunction intDivision)
         (Identifier "**", ProvidedFunction pow)
         (Identifier "??", ProvidedFunction juri)
         ]
