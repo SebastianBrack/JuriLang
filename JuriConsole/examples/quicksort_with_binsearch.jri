@@ -1,0 +1,86 @@
+# this programm creates an array with random numbers sorts them with quicksort algorithm and uses binarysearch
+# to find a number in the sorted array
+# output is either the index if the number was found in the array or -1 if not
+
+fun partition :array start end 
+     
+    pivot_index = start
+    pivot = pivot_index:array
+
+    if start < end repeat
+         
+        if (start < ?:array)
+            if (start:array <= pivot) repeat
+                if (start == ?:array-1)
+                    break
+                start = start + 1
+  
+        if end:array > pivot repeat
+            end = end - 1
+         
+        if(start < end)
+            temp = end:array
+            end:array = start:array
+            start:array = temp
+            
+    temp1 = pivot_index:array
+    pivot_index:array = end:array
+    end:array = temp1
+    
+    return end
+
+
+fun quick_sort :array start end 
+     
+    if (start < end)
+       
+        p = partition(:array start end )
+         
+        quick_sort(:array start p-1)
+        quick_sort(:array p+1 end )
+    1
+
+
+fun binary_search :arr low high x
+
+    if high >= low
+ 
+        mid = (high + low)//2
+
+        if mid:arr == x
+            return mid
+        
+        if mid:arr > x
+            return binary_search(:arr low mid-1 x)
+ 
+        if mid:arr <= x
+            return binary_search(:arr mid+1 high x)
+ 
+    
+    return -1
+
+
+fun main m
+    
+    :array = init 1000 as _
+        rand(1 1000)
+        
+    quick_sort(:array 0 (?:array-1))
+
+    x = rand(1 1000) 
+    index_of_result = binary_search(:array 0 (?:array)-1 x)
+    
+    # index_of_result is -1 if the number wasnt found
+    print(index_of_result)
+
+    m 
+
+
+main(1)
+
+
+
+
+
+
+
