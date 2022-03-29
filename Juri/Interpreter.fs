@@ -375,10 +375,10 @@ and private evalCustomFunction
     | Ok () ->
         let functionFilter _ = function | CustomFunction _ | ProvidedFunction _ -> true | _ -> false
         let argumentMapper = function
-            | Pointer id ->
-                match Map.tryFind id env with
-                | Some (List ns) -> Ok (List ns)
-                | _ -> Error $"{id} verweist auf eine nicht Existierende Liste."
+            | Pointer listExpression ->
+                match evalListExpression outputWriter state listExpression  with
+                | Ok ns -> Ok (List ns)
+                | Error msg -> Error msg
             | Value expression ->
                 match eval outputWriter state expression with
                 | Ok x -> Ok (Variable x)

@@ -16,9 +16,9 @@ type Expression =
     
 and GivenArgument =
     | Value of Expression
-    | Pointer of Identifier
+    | Pointer of ListExpression
     
-type ListExpression =
+and ListExpression =
     | LiteralList of Expression list
     | Range of lower: Expression * upper: Expression
     | ListReference of Identifier

@@ -175,11 +175,32 @@ let private jor =
 let private expression, expressionImpl = createParserForwarder ()
 let private singleExpression, singleExpressionImpl = createParserForwarder ()
 
+// list expressions
+let private listReference =
+    listIdentifier
+    |>> ListReference
+    
+let private listLiteral = 
+    openBracket >>. (many expression) .>> closingBracket
+    |>> LiteralList
+
+let private range =
+    openBracket >>. expression .>> rangeOperator
+    .>>. (expression |> failAsFatal)
+    .>> (closingBracket |> failAsFatal)
+    |>> Range
+
+let private listExpression =
+    [ range
+      listLiteral
+      listReference ]
+    |> choice
+
 
 
 // parameter
 let private parameter =
-    let listReference = listIdentifier |>> Pointer
+    let listReference = listExpression |>> Pointer
     let value = expression |>> Value
     either listReference value
 
@@ -229,26 +250,6 @@ let private listAccess =
 
 
 
-// list expressions
-let private listReference =
-    listIdentifier
-    |>> ListReference
-    
-let private listLiteral = 
-    openBracket >>. (many expression) .>> closingBracket
-    |>> LiteralList
-
-let private range =
-    openBracket >>. expression .>> rangeOperator
-    .>>. (expression |> failAsFatal)
-    .>> (closingBracket |> failAsFatal)
-    |>> Range
-
-let private listExpression =
-    [ range
-      listLiteral
-      listReference ]
-    |> choice
 
 
     
@@ -291,9 +292,6 @@ expressionImpl.Value <-
     either comparison singleExpression
     .>> ws
     |> deferr "Es wird ein Ausdruck erwartet."
-
-
-
 
 
 
