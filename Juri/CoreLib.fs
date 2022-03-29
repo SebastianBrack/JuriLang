@@ -35,6 +35,20 @@ let private buildinPrint : ProvidedFunction =
         |> String.Concat
         |> out.WriteSTD
         Ok 0.
+
+let private buildinBier : ProvidedFunction =
+    fun out args ->
+        out.WriteSTD "NIMM VERDAMMT NOCHMAL DIE HÄNDE WEG VON MEINEM BIER DU FICKSCHNITZEL SIND ZU VIEL JUUUNGE"
+        Ok 0.
+
+
+let private buildinJunge : ProvidedFunction =
+    fun out args ->
+        args
+        |> List.map (fun x -> $"{x} ")
+        |> String.Concat
+        |> out.WriteSTD
+        Ok 0.
         
 let private buildinPrintNewline : ProvidedFunction =
     let join separator a b = a + separator + b
@@ -85,6 +99,48 @@ let private buildinRandom : ProvidedFunction =
         | [a;b]   -> rand.Next(int a, int b) |> float |> Ok
         | _       -> Error (sprintf "Diese Funktion erwartet 1 oder 2 Argumente - es wurden aber %i übergeben." args.Length)
 
+let private buildinFactorial : ProvidedFunction =
+    fun _ args ->
+        let factorial n =
+            let rec loop i acc =
+                match i with
+                | 0 | 1 -> acc
+                | _ -> loop (i-1) (acc * i)
+            loop n 1
+        match args with
+        | [a]     -> factorial(int a) |> float |> Ok
+        | _       -> Error (sprintf "Diese Funktion erwartet 1 Argument - es wurden aber %i übergeben." args.Length)
+
+let private buildinSqrt : ProvidedFunction =
+    fun _ args ->
+        match args with
+        | [a]     -> sqrt a |> float |> Ok
+        | _       -> Error (sprintf "Diese Funktion erwartet 1  Argument - es wurden aber %i übergeben." args.Length)
+
+let private buildinFloor : ProvidedFunction =
+    fun _ args ->
+        match args with
+        | [a]     -> floor a |> float |> Ok
+        | _       -> Error (sprintf "Diese Funktion erwartet 1  Argument - es wurden aber %i übergeben." args.Length)
+
+let private buildinCeil : ProvidedFunction =
+    fun _ args ->
+        match args with
+        | [a]     -> ceil a |> float |> Ok
+        | _       -> Error (sprintf "Diese Funktion erwartet 1  Argument - es wurden aber %i übergeben." args.Length)
+
+
+let private buildinRound : ProvidedFunction =
+    fun _ args ->
+        match args with
+        | [a]     -> round a |> float |> Ok
+        | _       -> Error (sprintf "Diese Funktion erwartet 1  Argument - es wurden aber %i übergeben." args.Length)
+
+let private buildinPI : ProvidedFunction =
+    fun _ args ->
+        match args with
+        | [a]     -> Math.PI |> float |> Ok
+        | _       -> Error (sprintf "Diese Funktion erwartet 1  Argument - es wurden aber %i übergeben." args.Length)
 
 let private buildinQuickMath : ProvidedFunction =
     let test x =
@@ -236,9 +292,17 @@ let createEnvWithCoreLibFunctions () : Environment =
         (Identifier "printn", ProvidedFunction buildinPrintNewline)
         (Identifier "printc", ProvidedFunction buildinPrintChar)
         (Identifier "printcn", ProvidedFunction buildinPrintCharNewline)
+        (Identifier "juuunge", ProvidedFunction buildinJunge)
+        (Identifier "bier", ProvidedFunction buildinBier)
         (Identifier "input", ProvidedFunction buildinInput)
         (Identifier "rand", ProvidedFunction buildinRandom)
+        (Identifier "sqrt", ProvidedFunction buildinSqrt)
         (Identifier "quickmath", ProvidedFunction buildinQuickMath)
+        (Identifier "factorial", ProvidedFunction buildinFactorial)
+        (Identifier "floor", ProvidedFunction buildinFloor)
+        (Identifier "ceil", ProvidedFunction buildinCeil)
+        (Identifier "round", ProvidedFunction buildinRound)
+        (Identifier "PI", ProvidedFunction buildinPI)
         (Identifier "+", ProvidedFunction plus)
         (Identifier "-", ProvidedFunction minus)
         (Identifier "*", ProvidedFunction star)
