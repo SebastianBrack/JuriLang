@@ -1,6 +1,7 @@
 module Juri.Internal.Parser
 
 open System
+open Juri.Internal.LanguageModel
 open LanguageModel
 open ParserCombinators
 
@@ -228,6 +229,29 @@ let private listAccess =
 
 
 
+// list expressions
+let private listReference =
+    listIdentifier
+    |>> ListReference
+    
+let private listLiteral = 
+    openBracket >>. (many expression) .>> closingBracket
+    |>> LiteralList
+
+let private range =
+    openBracket >>. expression .>> rangeOperator
+    .>>. (expression |> failAsFatal)
+    .>> (closingBracket |> failAsFatal)
+    |>> Range
+
+let private listExpression =
+    [ range
+      listLiteral
+      listReference ]
+    |> choice
+
+
+    
 // Binary Expressions :O
 let private listToTree (single, chain): Expression =
     let rec traverse left rest =
@@ -270,9 +294,6 @@ expressionImpl.Value <-
 
 
 
-//let private listLiteral = 
-//   openBracket >>. (many expression) .>> closingBracket
-//    |>> LiteralList
 
 
 
@@ -432,7 +453,7 @@ let private listElementAssignment =
 
 let private listIteration =
     iterate
-    >>. (listIdentifier |> failAsFatal)
+    >>. (listExpression |> failAsFatal)
     .>> (jas |> failAsFatal)
     .>>. identifier
     ||>> addThisLineToResult

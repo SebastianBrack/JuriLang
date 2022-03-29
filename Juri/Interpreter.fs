@@ -219,7 +219,7 @@ and private computeFunctionDefinition
 
 
 and private computeListIteration
-        (listName, valueName, loopBody)
+        (listExpression, valueName, loopBody)
         (outputWriter: IOutputWriter)
         (state: ComputationState) : InterpreterResult<ComputationState> =
     
@@ -227,16 +227,15 @@ and private computeListIteration
     let computeIteration state value =
         computeAssignment (valueName, LiteralNumber value) outputWriter state
         >>= compute loopBody outputWriter
-    let rec iterate (xs: float array) pos state =
+    let rec iterate state pos (xs: float array) =
         if pos = xs.Length then
             Ok state
         else
             match computeIteration state xs[pos] with
             | Error e -> Error e
-            | Ok newState -> iterate xs (pos+1) { newState with BreakFlag = false; ReturnFlag = false } 
-    match (env.TryFind listName) with
-    | Some (List xs) -> iterate xs 0 state
-    | _ -> Error $"{listName} ist keine Liste."
+            | Ok newState -> iterate { newState with BreakFlag = false; ReturnFlag = false } (pos+1) xs
+    evalListExpression outputWriter state listExpression
+    >>= iterate state 0
 
 
 and compute
@@ -283,8 +282,8 @@ and compute
                 computeListInitialisationWithCode (listName, size, indexName, instructions) outputWriter state
             | ListElementAssignment(identifier, indexExpression, valueExpression) ->
                 computeListElementAssignment (identifier, indexExpression, valueExpression) outputWriter state
-            | Iteration(listName, elementName, loopBody) ->
-                computeListIteration (listName, elementName, loopBody) outputWriter state
+            | Iteration(listExpression, elementName, loopBody) ->
+                computeListIteration (listExpression, elementName, loopBody) outputWriter state
         
         match computationResult with
         | Ok newState -> compute tail outputWriter newState
@@ -407,3 +406,28 @@ and private evalCustomFunction
             | Error e -> Error e
             | Ok {LastExpression = None} -> Error "Die Funktion hat keinen Wert zurückgegeben"
             | Ok {LastExpression = Some x} -> Ok x
+            
+            
+            
+and private evalListExpression
+        (outputWriter: IOutputWriter)
+        (state: ComputationState)
+        (exp: ListExpression) : InterpreterResult<float array> =
+    
+    let env = state.Environment
+    match exp with
+    | ListReference id -> 
+        match (env.TryFind id) with
+        | Some (List xs) -> Ok xs
+        | _ -> Error $"{id} ist keine Liste."
+    | Range (low, high) ->
+        let lowerEvalResult = eval outputWriter state low
+        let upperEvalResult = eval outputWriter state high
+        match (lowerEvalResult, upperEvalResult) with
+        | Ok low, Ok up -> Ok [|low..up|]
+        | Error msg, _ -> Error msg
+        | _, Error msg -> Error msg
+    | LiteralList expressions ->
+        evalList outputWriter state expressions
+        |> Runtime.map List.toArray
+        
