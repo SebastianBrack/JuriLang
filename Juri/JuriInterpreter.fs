@@ -19,7 +19,7 @@ type public Interpreter() =
     member this.GetOutputStreams() = outputStreams
     member this.ParsingOk() = parsingOK
     member this.ParseJuriProgram(code: char seq) =
-        let charStream = CharStream(Seq.append "\n" code, JuriContext.Default)
+        let charStream = CharStream(code, JuriContext.Default)
         let parsingResult = charStream.RunParser(juriProgram)
         match parsingResult with
         | Success(instructions, _, _) ->
