@@ -27,9 +27,9 @@ let private checkFunctionSignature
     let matchesType expected given =
         match expected, given with
         | ValueArgument _, Value _ -> Ok ()
-        | ListPointer _, Pointer _ -> Ok ()
+        | PointerArgument _, Pointer _ -> Ok ()
         | ValueArgument id, Pointer _ -> Error $"Parameter {id} -> übergeben: Pointer - erwartet: einen berechenbaren Wert!"
-        | ListPointer id, Value _ -> Error $"Parameter {id} -> übergeben: berechenbarer Wert - erwartet: Pointer!"
+        | PointerArgument id, Value _ -> Error $"Parameter {id} -> übergeben: berechenbarer Wert - erwartet: Pointer!"
     if expectedArgs.Length <> givenArgs.Length then
         Error $"Diese Funktion erwartet %i{expectedArgs.Length} Argumente - es wurden aber %i{givenArgs.Length} übergeben."
     else
@@ -393,7 +393,7 @@ and private evalCustomFunction
         match evaluatedParams with
         | Error msg -> Error msg
         | Ok args ->
-            let parameterNames = parameter |> List.map (function |ValueArgument id -> id |ListPointer id -> id)
+            let parameterNames = parameter |> List.map (function |ValueArgument id -> id |PointerArgument id -> id)
             let scopedVariables = args |> List.zip parameterNames
             let scopedFunctions = env |> Map.filter functionFilter |> Map.toList
             let functionEnv = Map (scopedVariables @ scopedFunctions)

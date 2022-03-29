@@ -279,7 +279,7 @@ expressionImpl.Value <-
 // argument
 let argument =
     let valueArgument = identifier |>> ValueArgument
-    let listPointer = listIdentifier |>> ListPointer
+    let listPointer = listIdentifier |>> PointerArgument
     either listPointer valueArgument
 
 

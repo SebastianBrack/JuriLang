@@ -20,7 +20,7 @@ and GivenArgument =
     
 type Parameter =
     | ValueArgument of Identifier
-    | ListPointer of Identifier
+    | PointerArgument of Identifier
 
 type Instruction =
     | Expression of Expression
