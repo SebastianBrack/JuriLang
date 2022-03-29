@@ -1,0 +1,15 @@
+:l = [1 to 10]
+
+fun map :o
+    i=0
+    if i < ?:o repeat
+        i:o=69
+        i=i+1
+    1
+
+map(:l)
+
+iterate :l as i
+    print(i)
+    
+# output :  69 69 69 69 69 69 69 69 69 69 
