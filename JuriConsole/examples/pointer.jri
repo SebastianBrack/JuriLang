@@ -1,6 +1,5 @@
 ﻿# Dieses Beispiel demonstriert den Einsatz von Array-Referenzierung
 
-
 fun map :list
         i=0
         if i < ?:list repeat

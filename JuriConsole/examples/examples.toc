@@ -1,1 +1,10 @@
+euler/euler1.jri
+euler/euler2.jri
+euler/euler6.jri
+euler/euler9.jri
 fizzbuzz.jri
+basicarraymodification.jri
+binarysearch.jri
+pointer.jri
+primesieve.jri
+quicksort.jri
