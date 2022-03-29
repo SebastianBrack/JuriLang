@@ -8,3 +8,4 @@ binarysearch.jri
 pointer.jri
 primesieve.jri
 quicksort.jri
+quicksort_with_binsearch.jri
