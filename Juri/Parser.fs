@@ -84,6 +84,7 @@ let private operator =
         |> Set |> anyOf
 
     many1 operatorChar
+    |> satisfies (fun opChars _ -> opChars <> ['='])
     .>> ws
     |>> (String.Concat >> BinaryOperator)
     
@@ -420,7 +421,7 @@ let private listInitialisationWithValue =
 
 
 let private listElementAssignment =
-    (number <|> variableReference <|> functionCall)
+    (number <|> variableReference <|> parenthesizedExpression)
     .>>. listIdentifier
     .>> eq
     .>>. (expression |> failAsFatal)
