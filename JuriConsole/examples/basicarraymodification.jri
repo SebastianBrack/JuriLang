@@ -10,4 +10,6 @@ fun map :o
 map(:l)
 
 iterate :l as i
-    printn(i)
+    print(i)
+    
+# output :  69 69 69 69 69 69 69 69 69 69 
