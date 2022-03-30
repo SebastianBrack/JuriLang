@@ -1,5 +1,6 @@
 euler/euler1.jri
 euler/euler2.jri
+euler/euler5_ver1.jri
 euler/euler6.jri
 euler/euler9.jri
 fizzbuzz.jri
