@@ -223,7 +223,6 @@ and private computeListIteration
         (outputWriter: IOutputWriter)
         (state: ComputationState) : InterpreterResult<ComputationState> =
     
-    let env = state.Environment
     let computeIteration state value =
         computeAssignment (valueName, LiteralNumber value) outputWriter state
         >>= compute loopBody outputWriter
@@ -233,7 +232,9 @@ and private computeListIteration
         else
             match computeIteration state xs[pos] with
             | Error e -> Error e
-            | Ok newState -> iterate { newState with BreakFlag = false; ReturnFlag = false } (pos+1) xs
+            | Ok nextState when nextState.ReturnFlag = true -> Ok nextState
+            | Ok nextState when nextState.BreakFlag = true -> Ok {nextState with BreakFlag = false}
+            | Ok newState -> iterate newState (pos+1) xs
     evalListExpression outputWriter state listExpression
     >>= iterate state 0
 
