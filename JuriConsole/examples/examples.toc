@@ -5,7 +5,7 @@ euler/euler9.jri
 fizzbuzz.jri
 basicarraymodification.jri
 binarysearch.jri
-lists.jri
+inline_array_definition.jri
 pointer.jri
 primesieve.jri
 quicksort.jri
