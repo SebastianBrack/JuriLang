@@ -160,6 +160,21 @@ iterate :nums as x
 
 # output: 2 4 6 8 10 12 14 16 18 20
 ```
+# Inline Arraydefinierung
+
+```python
+fun sniplist :arr low high
+    iterate [low to high] as i
+        print(i:arr)
+    printcn()    
+        
+:nums = [0 to 100]      
+
+sniplist(:nums 2 5)
+sniplist([4 8 564 99  12154 54] 2 5)
+sniplist([222 to 333] 2 5)
+
+```
 
 
 >*schaut gerne im JuriConsole/examples Ordner vorbei, dort findet ihr ein paar Programme die Juri geschrieben sind :)*
