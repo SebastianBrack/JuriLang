@@ -160,7 +160,7 @@ iterate :nums as x
 
 # output: 2 4 6 8 10 12 14 16 18 20
 ```
-# Inline Arraydefinierung
+**Inline Arraydefinierung**
 
 ```python
 fun sniplist :arr low high
