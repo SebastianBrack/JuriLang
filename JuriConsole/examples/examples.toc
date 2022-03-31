@@ -1,3 +1,4 @@
+fibonacci.jri
 euler/euler1.jri
 euler/euler2.jri
 euler/euler6.jri
