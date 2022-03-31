@@ -4,6 +4,7 @@ open System
 open Juri.Internal.LanguageModel
 open LanguageModel
 open ParserCombinators
+open CoreLib
 
 type IndentationType =
     | Tabs
@@ -15,12 +16,14 @@ type JuriContext =
         IndentationType : IndentationType
         IndentationStack : int list
         Line : int
+        Functions : Identifier list
     }
     static member Default =
         {
             IndentationType = Unknown
             IndentationStack = [0]
             Line = 1
+            Functions = createEnvWithCoreLibFunctions () |> Map.toList |> List.map fst
         }
 
 
@@ -251,8 +254,8 @@ let private variableReference =
 
 
 let private functionCall =
-    identifier .>> openParen .>>. (many parameter)
-    .>> (closingParen |> failAsFatal)
+    identifier |> satisfies (fun id c -> List.contains id c.Functions)
+    .>>. (many parameter)
     |>> FunctionCall
 
 
@@ -484,6 +487,7 @@ let private listIteration =
 let private functionDefinition =
     jfun
     >>. (identifier |> failAsFatal)
+    |> updateContext (fun id c -> {c with Functions = id :: c.Functions})
     .>>. ((many argument) |> failAsFatal)
     ||>> addThisLineToResult
     .>> newline .>> emptyLines
