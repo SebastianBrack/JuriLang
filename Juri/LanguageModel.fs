@@ -13,7 +13,6 @@ type Expression =
     | Unary of operator: BinaryOperator * Expression
     | ParenthesizedExpression of Expression
     
-    
 and GivenArgument =
     | Value of Expression
     | Pointer of ListExpression
@@ -30,8 +29,7 @@ type Parameter =
 type Instruction =
     | Expression of Expression
     | Assignment of variableName: Identifier * value: Expression
-    | ListAssignment of listName: Identifier * values: Expression list
-    | ListAssignmentWithRange of listName: Identifier * lowerBound: Expression * upperBound: Expression
+    | ListAssignment of listName: Identifier * values: ListExpression
     | ListInitialisationWithValue of listName: Identifier * size: Expression * value: Expression
     | ListInitialisationWithCode of listName: Identifier * size: Expression * indexName: Identifier * body: JuriProgram
     | ListElementAssignment of  listName: Identifier * index: Expression * value: Expression
@@ -41,6 +39,5 @@ type Instruction =
     | OperatorDefinition of operator: BinaryOperator * leftArg: Parameter * rightArg: Parameter * functionBody: JuriProgram
     | Break
     | Return of Expression
-
 
 and JuriProgram = (Instruction * int) list

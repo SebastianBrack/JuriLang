@@ -81,39 +81,22 @@ and private computeAssignment
     
     
 and private computeListAssignment
-        (id, expressions)
+        (id, listExpression)
         (outputWriter: IOutputWriter)
         (state: ComputationState) : InterpreterResult<ComputationState> =
         
     let env = state.Environment
-    let addListToState (xs: float list) =
-        let newEnv = env |> Map.add id (List (List.toArray xs))
+    
+    let addListToState (xs: float array) =
+        let newEnv = env |> Map.add id (List xs)
         Ok {state with LastExpression = None; Environment = newEnv}
-    match (env.TryFind id) with
-    | None | Some (List _) ->
-        evalList outputWriter state expressions 
-        >>= addListToState
-    | _ -> Error $"{id} ist keine Liste und kann keine entsprechenden Werte zugewiesen bekommen."
-    
-    
-    
-and private computeListAssignmentWithRange
-        (id, lowerBoundExpression, upperBoundExpression)
-        (outputWriter: IOutputWriter)
-        (state: ComputationState) : InterpreterResult<ComputationState> =
         
-    let env = state.Environment
     match (env.TryFind id) with
     | None | Some (List _) ->
-        let lowerEvalResult = eval outputWriter state lowerBoundExpression
-        let upperEvalResult = eval outputWriter state upperBoundExpression
-        match (lowerEvalResult, upperEvalResult) with
-        | Ok low, Ok up ->
-            let newEnv = env |> Map.add id (List [|low..up|])
-            Ok {state with LastExpression = None; Environment = newEnv}
-        | Error msg, _ -> Error msg
-        | _, Error msg -> Error msg
-    | _ -> Error $"{id} ist keine Liste und kann keine entsprechenden Werte zugewiesen bekommen."
+        evalListExpression outputWriter state listExpression 
+        >>= addListToState
+    | _ ->
+        Error $"{id} ist keine Liste und kann keine entsprechenden Werte zugewiesen bekommen."
     
     
     
@@ -275,8 +258,6 @@ and compute
                 computeFunctionDefinition (Identifier opName, [leftName; rightName], body) state
             | ListAssignment(listName, expressions) ->
                 computeListAssignment (listName, expressions) outputWriter state
-            | ListAssignmentWithRange (listName, lowerBound, upperBound) ->
-                computeListAssignmentWithRange (listName, lowerBound, upperBound) outputWriter state
             | ListInitialisationWithValue (listName, size, value) ->
                 computeListInitialisationWithValue (listName, size, value) outputWriter state
             | ListInitialisationWithCode(listName, size, indexName, instructions) ->
