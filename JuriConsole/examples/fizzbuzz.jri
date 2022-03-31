@@ -5,27 +5,21 @@
 # 102 105 122 122 fizz
 # 98 117 122 122 buzz
 
-i = 1
+# prints a list as a sequence of characters
+fun prints :string
+    iterate :string as c
+        printc(c)
 
-fun and l r
-    return l*r
+iterate [0 to 100] as n
+    # print fizz
+    if n%3 == 0 then prints([102 105 122 122])
 
-if i < 100 repeat
-    t=0
-    t1=0
-    help=0
-    if i%3==0
-        t=1
-    if i%5==0
-        t1=1
-    if and(t t1)
-        printcn(102 105 122 122 98 117 122 122)
-        help=1
-    if help == 0
-        if t
-            printcn(102 105 122 122)
-        if t1
-            printcn(98 117 122 122)
-        if 0 == t + t1
-            printn(i)
-    i=i+1
+    # print buzz
+    if n%5 == 0 then prints([98 117 122 122])
+
+    # '*' is logical 'and' but always evaluates both sides
+    # print number
+    if (n%3 != 0) * (n%5 != 0) then print(n)
+
+    # print CR LF
+    prints([13 10])

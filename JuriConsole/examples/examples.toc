@@ -1,8 +1,5 @@
+helloworld.jri
 fibonacci.jri
-euler/euler1.jri
-euler/euler2.jri
-euler/euler6.jri
-euler/euler9.jri
 fizzbuzz.jri
 basicarraymodification.jri
 binarysearch.jri
@@ -11,3 +8,8 @@ pointer.jri
 primesieve.jri
 quicksort.jri
 quicksort_with_binsearch.jri
+euler/euler1.jri
+euler/euler2.jri
+euler/euler5_ver1.jri
+euler/euler6.jri
+euler/euler9.jri
