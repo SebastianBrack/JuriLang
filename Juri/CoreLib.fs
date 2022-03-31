@@ -143,9 +143,11 @@ let private buildinPI : ProvidedFunction =
         | _       -> Error (sprintf "Diese Funktion erwartet 1  Argument - es wurden aber %i übergeben." args.Length)
 
 let private buildinTime : ProvidedFunction =
-    fun _ _ ->
-        let time = DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds()
-        time |> float |> Ok
+    fun _ args ->
+        match args with
+        | [] -> DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds() |> float |> Ok
+        | _  -> Error (sprintf "Diese Funktion erwartet 0 Argumente - es wurden aber %i übergeben." args.Length)
+        
 
 let private buildinQuickMath : ProvidedFunction =
     let test x =
