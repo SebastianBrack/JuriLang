@@ -364,7 +364,7 @@ and private eval
         | None -> Error $"Der Operator %A{op} ist nicht definiert"
     | Binary (BinaryOperator op, left, right) ->
         match op with
-        | "and" | "or" -> evalLogicalExpression outputWriter state (op, left, right)
+        | "and " | "or " -> evalLogicalExpression outputWriter state (op, left, right)
         | _ -> 
         match (Map.tryFind (Identifier op) env) with
             | Some (ProvidedFunction f) ->
