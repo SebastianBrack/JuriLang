@@ -32,6 +32,7 @@
         <Content Include="examples\binarysearch.jri" />
         <Content Include="examples\basicarraymodification.jri" />
         <Content Include="examples\lists.jri" />
+        <Content Include="examples\fibonacci.jri" />
     </ItemGroup>
     
 </Project>

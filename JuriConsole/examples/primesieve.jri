@@ -9,8 +9,9 @@
 
 iterate :primes as p
     if p
-        notPrime = p*2
+        notPrime = p*p
         if notPrime < ?:primes repeat
             notPrime:primes = 0
             notPrime = notPrime + p
-        printn(p)
+
+printn(p)

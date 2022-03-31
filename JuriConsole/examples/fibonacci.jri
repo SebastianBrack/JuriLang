@@ -1,0 +1,20 @@
+﻿# Dieses juri Programm berechnet die ersten 80 Zahlen der Fibonacci-Folge.
+
+
+# Funktion zum Berechnen einer belibigen Zahl der Fibonacci-Folge.
+
+fun fib nth
+    last = 1
+    this = 0
+    iterate [1 to nth] as _
+        temp = this
+        this = last + this
+        last = temp
+    this
+    
+    
+# Nun rufen wir unsere Funktion jeweils einmal mit den Zahlen
+# von 1 bis 80 auf und geben das Ergebniss aus.
+
+iterate [1 to 80] as n
+    printn(n fib(n))
