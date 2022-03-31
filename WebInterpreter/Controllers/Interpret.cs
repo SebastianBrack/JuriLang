@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 public class JuriCompilerController : Controller
 {
     [HttpGet]
-    public JsonResult InterpretCode([FromQuery]string code)
+    public async Task<JuriOutput> InterpretCode([FromQuery]string code)
     {
         var codeBytes = Microsoft.AspNetCore.WebUtilities.WebEncoders.Base64UrlDecode(code);
         var codeText = System.Text.Encoding.UTF8.GetString(codeBytes);
@@ -26,6 +26,7 @@ public class JuriCompilerController : Controller
             interpreter.ExecuteProgram();
         }
 
-        return Json(new JuriOutput(interpreter.GetOutputStreams()));
+        await Task.CompletedTask;
+        return new JuriOutput(interpreter.GetOutputStreams());
     }
 }
