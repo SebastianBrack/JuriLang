@@ -214,13 +214,17 @@ let private charList =
     .>> pchar '''
     |>> (fun cs -> cs |> List.map (int >> float >> LiteralNumber) |> LiteralList)
 
-let private listExpression =
+let private nakedListExpression =
     [ range
       listLiteral
       charList
       listReference ]
     |> choice
 
+let private listExpression =
+    let parenthesizedListExpression =
+        openParen >>. nakedListExpression .>> closingParen
+    either nakedListExpression parenthesizedListExpression
 
 
 // parameter
