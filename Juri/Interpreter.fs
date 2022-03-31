@@ -329,17 +329,49 @@ and private eval
             evalCustomFunction (argNames, body) args outputWriter state
         | Some _ -> Error $"{id} ist keine Funktion."
         | None -> Error $"Der Verweis auf %A{id} konnte nicht aufgelöst werden."
-    | Binary (BinaryOperator op, left, right) ->
+    | Unary (BinaryOperator op, expression) ->
         match (Map.tryFind (Identifier op) env) with
         | Some (ProvidedFunction f) ->
-            evalList outputWriter state [left;right]
+            evalList outputWriter state [expression]
             >>= (f outputWriter)
         | Some (CustomFunction (argNames, body)) ->
-            evalCustomFunction (argNames, body) [Value left; Value right] outputWriter state
+            evalCustomFunction (argNames, body) [Value expression] outputWriter state
         | Some _ -> Error $"{id} ist kein Operator."
         | None -> Error $"Der Operator %A{op} ist nicht definiert"
+    | Binary (BinaryOperator op, left, right) ->
+        match op with
+        | "and" | "or" -> evalLogicalExpression outputWriter state (op, left, right)
+        | _ -> 
+        match (Map.tryFind (Identifier op) env) with
+            | Some (ProvidedFunction f) ->
+                evalList outputWriter state [left;right]
+                >>= (f outputWriter)
+            | Some (CustomFunction (argNames, body)) ->
+                evalCustomFunction (argNames, body) [Value left; Value right] outputWriter state
+            | Some _ -> Error $"{id} ist kein Operator."
+            | None -> Error $"Der Operator %A{op} ist nicht definiert"
     | ParenthesizedExpression expression ->
         eval outputWriter state expression
+        
+        
+and evalLogicalExpression
+        (outputWriter: IOutputWriter)
+        (state: ComputationState) 
+        (operation, left, right) : InterpreterResult<float> =
+   
+    match operation with
+    | "and" ->
+        match eval outputWriter state left with
+        | Error msg -> Error msg
+        | Ok 0. -> Ok 0. // if the left side of logical and is false we dont need to evaluate the right side
+        | Ok _ -> eval outputWriter state right
+    | "or" ->
+        match eval outputWriter state left with
+        | Error msg -> Error msg
+        | Ok 0. -> eval outputWriter state right
+        | Ok _ -> Ok 1. // if the left side of logical or is true we dont need to evaluate the right side
+    | x ->
+        Error $"Unbekannter boolischer Operator \"{x}\""
 
 
 and private evalListAccess

@@ -3,8 +3,6 @@ module Juri.Internal.LanguageModel
 
 type Identifier = Identifier of string
 type BinaryOperator = BinaryOperator of string
-
-
 type Expression =
     | LiteralNumber of float
     | ListAccess of Identifier * Expression
@@ -12,7 +10,9 @@ type Expression =
     | VariableReference of Identifier
     | FunctionCall of functionName: Identifier * parameter: GivenArgument list
     | Binary of operator: BinaryOperator * left: Expression * right: Expression
+    | Unary of operator: BinaryOperator * Expression
     | ParenthesizedExpression of Expression
+    
     
 and GivenArgument =
     | Value of Expression
