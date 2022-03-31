@@ -4,13 +4,19 @@ open System
 open Runtime
 open LanguageModel
 
+// helper functions
+let private argsError expected given = Error ($"Diese Funktion erwartet {expected} Argumente - es wurden aber {given} übergeben")
+
 let private buildinAdd : ProvidedFunction = fun _ args -> args |> List.reduce ( + ) |> Ok
 let private buildinMul : ProvidedFunction = fun _ args -> args |> List.reduce ( * ) |> Ok
 let private buildinSub : ProvidedFunction = fun _ args -> args |> List.reduce ( - ) |> Ok
 let private buildinDiv : ProvidedFunction = fun _ args -> args |> List.reduce ( / ) |> Ok
 
-
-
+let private buildinNot : ProvidedFunction =
+    fun _ args ->
+        match args with
+        | [x] -> if x = 0. then Ok 1. else Ok 0.
+        | _   -> argsError 1 args.Length
 
 let private buildinEquals : ProvidedFunction =
     fun _ args ->
@@ -226,6 +232,7 @@ let private pow : ProvidedFunction =
 
 let createEnvWithCoreLibFunctions () : Environment =
     Map [
+        (Identifier "not", ProvidedFunction buildinNot)
         (Identifier "add", ProvidedFunction buildinAdd)
         (Identifier "mul", ProvidedFunction buildinMul)
         (Identifier "sub", ProvidedFunction buildinSub)

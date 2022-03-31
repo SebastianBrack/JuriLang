@@ -111,6 +111,18 @@ let operatorProduct =
     let isProductOperator op _ = operatorPrecedence op = 0
     operator |> satisfies isProductOperator
 
+let private operatorNot =
+    pstring "not" .>> ws
+    |>> BinaryOperator
+    
+let private operatorAnd =
+    pstring "and" .>> ws
+    |>> BinaryOperator
+    
+let private operatorOr =
+    pstring "or" .>> ws
+    |>> BinaryOperator
+
 
 
 // keywords and control chars
@@ -162,18 +174,13 @@ let openBracket =
 let closingBracket =
     pchar ']' .>> ws |> deferr "Es fehlt eine schließende Klammer"
     
-let private jnot =
-    pstring "not" .>> ws
     
-let private jand =
-    pstring "and" .>> ws
     
-let private jor =
-    pstring "or" .>> ws
-
 // expressions
 let private expression, expressionImpl = createParserForwarder ()
 let private singleExpression, singleExpressionImpl = createParserForwarder ()
+
+
 
 // list expressions
 let private listReference =
@@ -250,6 +257,9 @@ let private listAccess =
 
 
 
+let private logicalNegation =
+    operatorNot .>>. expression
+    |>> Unary
 
 
     
@@ -264,8 +274,7 @@ let private listToTree (single, chain): Expression =
 let private product =
     singleExpression
     .>>. many (operatorProduct .>>. singleExpression)
-    |>> listToTree
-    
+    |>> listToTree 
 let private sum =
     product .>>. many (operatorSum .>>. product)
     |>> listToTree
@@ -273,12 +282,20 @@ let private sum =
 let private comparison =
     sum .>>. many (operatorComparison .>>. sum)
     |>> listToTree
-
+    
+let private logicalProduct =
+    comparison .>>. many (operatorAnd .>>. comparison)
+    |>> listToTree
+    
+let private logicalSum =
+    logicalProduct .>>. many (operatorOr .>>. logicalProduct)
+    |>> listToTree
 
 
 singleExpressionImpl.Value <-
     [
         parenthesizedExpression
+        logicalNegation
         listAccess
         functionCall
         variableReference
@@ -289,7 +306,7 @@ singleExpressionImpl.Value <-
     
 
 expressionImpl.Value <-
-    either comparison singleExpression
+    either logicalSum singleExpression
     .>> ws
     |> deferr "Es wird ein Ausdruck erwartet."
 
