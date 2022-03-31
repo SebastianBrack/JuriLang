@@ -197,6 +197,7 @@ and private computeFunctionDefinition
     | None -> addFunctionToState ()
 
 
+
 and private computeListIteration
         (listExpression, valueName, loopBody)
         (outputWriter: IOutputWriter)
@@ -205,6 +206,7 @@ and private computeListIteration
     let computeIteration state value =
         computeAssignment (valueName, LiteralNumber value) outputWriter state
         >>= compute loopBody outputWriter
+
     let rec iterate state pos (xs: float array) =
         if pos = xs.Length then
             Ok state
@@ -214,10 +216,34 @@ and private computeListIteration
             | Ok nextState when nextState.ReturnFlag = true -> Ok nextState
             | Ok nextState when nextState.BreakFlag = true -> Ok {nextState with BreakFlag = false}
             | Ok nextState when nextState.SkipFlag = true ->
-                 iterate {nextState with SkipFlag = false} (pos+1) xs
-            | Ok nextState -> iterate nextState (pos+1) xs
+                 iterate {nextState with SkipFlag = false} (pos + 1) xs
+            | Ok nextState -> iterate nextState (pos + 1) xs
+
     evalListExpression outputWriter state listExpression
     >>= iterate state 0
+
+
+
+and private computeIteration
+        (times, loopBody)
+        (outputWriter: IOutputWriter)
+        (state: ComputationState) : InterpreterResult<ComputationState> =
+
+    let rec iterate state times =
+        if times < 1.  then
+            Ok state
+        else
+            match compute loopBody outputWriter state with
+            | Error e -> Error e
+            | Ok nextState when nextState.ReturnFlag = true -> Ok nextState
+            | Ok nextState when nextState.BreakFlag = true -> Ok {nextState with BreakFlag = false}
+            | Ok nextState when nextState.SkipFlag = true ->
+                 iterate {nextState with SkipFlag = false} (times - 1.)
+            | Ok nextState -> iterate nextState (times - 1.)
+
+    eval outputWriter state times
+    >>= iterate state 
+
     
     
 and computeCry
@@ -277,8 +303,10 @@ and compute
                 computeListInitialisationWithCode (listName, size, indexName, instructions) outputWriter state
             | ListElementAssignment(identifier, indexExpression, valueExpression) ->
                 computeListElementAssignment (identifier, indexExpression, valueExpression) outputWriter state
-            | Iteration(listExpression, elementName, loopBody) ->
+            | ListIteration(listExpression, elementName, loopBody) ->
                 computeListIteration (listExpression, elementName, loopBody) outputWriter state
+            | Iteration (times, body) ->
+                computeIteration (times, body) outputWriter state
             | Cry message ->
                 computeCry message outputWriter state
         

@@ -18,14 +18,16 @@ let private runScript (script: string) =
         | Error _ -> 0
         | Ok (state,stream) -> 
             match stream.RunParser(juriProgram)  with
-            | Success (r,_,_) -> 
+            | Success (r,_,_) ->
                 compute r outputWriter state
                 |> ignore
                 0
             | Failure (msg, _) ->
+                printfn $"{stream.GetContext()}"
                 outputWriter.WriteERR(msg, stream.GetContext().Line)
                 0
             | Fatal (msg, _) -> 
+                printfn $"{stream.GetContext()}"
                 outputWriter.WriteERR(msg, stream.GetContext().Line)
                 0
 

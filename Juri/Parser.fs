@@ -4,6 +4,7 @@ open System
 open Juri.Internal.LanguageModel
 open LanguageModel
 open ParserCombinators
+open CoreLib
 
 type IndentationType =
     | Tabs
@@ -15,12 +16,14 @@ type JuriContext =
         IndentationType : IndentationType
         IndentationStack : int list
         Line : int
+        Functions : Identifier list
     }
     static member Default =
         {
             IndentationType = Unknown
             IndentationStack = [0]
             Line = 1
+            Functions = createEnvWithCoreLibFunctions () |> Map.toList |> List.map fst
         }
 
 
@@ -112,15 +115,15 @@ let operatorProduct =
     operator |> satisfies isProductOperator
 
 let private operatorNot =
-    pstring "not" .>> ws
+    pstring "not " .>> ws
     |>> BinaryOperator
     
 let private operatorAnd =
-    pstring "and" .>> ws
+    pstring "and " .>> ws
     |>> BinaryOperator
     
 let private operatorOr =
-    pstring "or" .>> ws
+    pstring "or " .>> ws
     |>> BinaryOperator
 
 
@@ -143,6 +146,9 @@ let jreturn =
     
 let iterate =
     pstring "iterate" .>> ws
+
+let jtimes =
+    pstring "times" .>> ws
     
 let jas =
     pstring "as" .>> ws
@@ -251,8 +257,8 @@ let private variableReference =
 
 
 let private functionCall =
-    identifier .>> openParen .>>. (many parameter)
-    .>> (closingParen |> failAsFatal)
+    identifier |> satisfies (fun id c -> List.contains id c.Functions)
+    .>>. (many parameter)
     |>> FunctionCall
 
 
@@ -465,25 +471,37 @@ let private listElementAssignment =
     .>> eq
     .>>. (expression |> failAsFatal)
     |>> fun ((index, id), exp) -> ListElementAssignment (id, index, exp)
-    |> singleLineStatementEnding
+    |> singleLineStatementEnding 
 
 
 
 let private listIteration =
     iterate
-    >>. (listExpression |> failAsFatal)
+    >>. listExpression
     .>> (jas |> failAsFatal)
     .>>. identifier
     ||>> addThisLineToResult
     .>> newline .>> emptyLines
     .>>. (codeblock |> failAsFatal)
-    |>> fun (((listName, elementName), line), body) -> (Iteration (listName, elementName, body)), line
+    |>> fun (((list, elementName), line), body) -> (ListIteration (list, elementName, body)), line
+ 
+
+
+let private iteration =
+    iterate
+    >>. expression
+    .>> (jtimes |> failAsFatal)
+    ||>> addThisLineToResult
+    .>> newline .>> emptyLines
+    .>>. (codeblock |> failAsFatal)
+    |>> fun ((repetitions, line), body) -> (Iteration (repetitions, body)), line
     
-    
+
 
 let private functionDefinition =
     jfun
     >>. (identifier |> failAsFatal)
+    |> updateContext (fun id c -> {c with Functions = id :: c.Functions})
     .>>. ((many argument) |> failAsFatal)
     ||>> addThisLineToResult
     .>> newline .>> emptyLines
@@ -566,6 +584,7 @@ instructionImpl.Value <-
         listInitialisationWithValue 
         listElementAssignment 
         listIteration
+        iteration
         breakStatement 
         returnStatement
         skipStatement
