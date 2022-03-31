@@ -38,6 +38,7 @@ let private buildinPrint : ProvidedFunction =
 
 let private buildinBier : ProvidedFunction =
     fun out args ->
+        
         out.WriteSTD "NIMM VERDAMMT NOCHMAL DIE HÄNDE WEG VON MEINEM BIER DU FICKSCHNITZEL SIND ZU VIEL JUUUNGE"
         Ok 0.
 
@@ -115,32 +116,32 @@ let private buildinSqrt : ProvidedFunction =
     fun _ args ->
         match args with
         | [a]     -> sqrt a |> float |> Ok
-        | _       -> Error (sprintf "Diese Funktion erwartet 1  Argument - es wurden aber %i übergeben." args.Length)
+        | _       -> Error (sprintf "Diese Funktion erwartet 1 Argument - es wurden aber %i übergeben." args.Length)
 
 let private buildinFloor : ProvidedFunction =
     fun _ args ->
         match args with
         | [a]     -> floor a |> float |> Ok
-        | _       -> Error (sprintf "Diese Funktion erwartet 1  Argument - es wurden aber %i übergeben." args.Length)
+        | _       -> Error (sprintf "Diese Funktion erwartet 1 Argument - es wurden aber %i übergeben." args.Length)
 
 let private buildinCeil : ProvidedFunction =
     fun _ args ->
         match args with
         | [a]     -> ceil a |> float |> Ok
-        | _       -> Error (sprintf "Diese Funktion erwartet 1  Argument - es wurden aber %i übergeben." args.Length)
+        | _       -> Error (sprintf "Diese Funktion erwartet 1 Argument - es wurden aber %i übergeben." args.Length)
 
 
 let private buildinRound : ProvidedFunction =
     fun _ args ->
         match args with
         | [a]     -> round a |> float |> Ok
-        | _       -> Error (sprintf "Diese Funktion erwartet 1  Argument - es wurden aber %i übergeben." args.Length)
+        | _       -> Error (sprintf "Diese Funktion erwartet 1 Argument - es wurden aber %i übergeben." args.Length)
 
 let private buildinPI : ProvidedFunction =
     fun _ args ->
         match args with
-        | [a]     -> Math.PI |> float |> Ok
-        | _       -> Error (sprintf "Diese Funktion erwartet 1  Argument - es wurden aber %i übergeben." args.Length)
+        | []     -> Math.PI |> float |> Ok
+        | _       -> Error (sprintf "Diese Funktion erwartet 1 Argument - es wurden aber %i übergeben." args.Length)
 
 let private buildinTime : ProvidedFunction =
     fun _ args ->
