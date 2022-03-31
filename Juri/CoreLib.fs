@@ -142,6 +142,11 @@ let private buildinPI : ProvidedFunction =
         | [a]     -> Math.PI |> float |> Ok
         | _       -> Error (sprintf "Diese Funktion erwartet 1  Argument - es wurden aber %i übergeben." args.Length)
 
+let private buildinTime : ProvidedFunction =
+    fun _ _ ->
+        let time = DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds()
+        time |> float |> Ok
+
 let private buildinQuickMath : ProvidedFunction =
     let test x =
         if x <= 20 then "+"
@@ -303,6 +308,7 @@ let createEnvWithCoreLibFunctions () : Environment =
         (Identifier "ceil", ProvidedFunction buildinCeil)
         (Identifier "round", ProvidedFunction buildinRound)
         (Identifier "PI", ProvidedFunction buildinPI)
+        (Identifier "time", ProvidedFunction buildinTime)
         (Identifier "+", ProvidedFunction plus)
         (Identifier "-", ProvidedFunction minus)
         (Identifier "*", ProvidedFunction star)
