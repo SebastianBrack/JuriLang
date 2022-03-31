@@ -45,8 +45,6 @@ let private buildinBier : ProvidedFunction =
         | _   ->
             Error (sprintf "Isch wollte ein Argumente Juunge - WAS WILLST DU MIT %i DU HUSO !?!?. Komm ma klar man" args.Length)
         
-
-
 let private buildinJunge : ProvidedFunction =
     fun out args ->
         args
@@ -134,7 +132,6 @@ let private buildinCeil : ProvidedFunction =
         | [a]     -> ceil a |> float |> Ok
         | _       -> Error (sprintf "Diese Funktion erwartet 1 Argument - es wurden aber %i übergeben." args.Length)
 
-
 let private buildinRound : ProvidedFunction =
     fun _ args ->
         match args with
@@ -153,7 +150,6 @@ let private buildinTime : ProvidedFunction =
         | [] -> DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds() |> float |> Ok
         | _  -> Error (sprintf "Diese Funktion erwartet 0 Argumente - es wurden aber %i übergeben." args.Length)
         
-
 let private buildinQuickMath : ProvidedFunction =
     let test x =
         if x <= 20 then "+"
@@ -180,7 +176,6 @@ let private buildinQuickMath : ProvidedFunction =
             | "**"-> a ** b |> float |> Ok
             | _ -> Error (sprintf "Du bist ein Otto")
         | _     -> Error (sprintf "Diese Funktion erwartet 2 Argumente - es wurden aber %i übergeben." args.Length)
-
 
 let private argError n = Error (sprintf "Diese Funktion erwartet 2 Argumente - es wurden aber %i übergeben" n)
 
