@@ -38,9 +38,13 @@ let private buildinPrint : ProvidedFunction =
 
 let private buildinBier : ProvidedFunction =
     fun out args ->
+        match args with
+        | [a] ->
+            out.WriteSTD $"NIMM VERDAMMT NOCHMAL DIE HÄNDE WEG VON MEINEM BIER DU FICKSCHNITZEL {a} SIND ZU VIEL JUUUNGE \n"
+            Ok 0.
+        | _   ->
+            Error (sprintf "Isch wollte ein Argumente Juunge - WAS WILLST DU MIT %i DU HUSO !?!?. Komm ma klar man" args.Length)
         
-        out.WriteSTD "NIMM VERDAMMT NOCHMAL DIE HÄNDE WEG VON MEINEM BIER DU FICKSCHNITZEL SIND ZU VIEL JUUUNGE"
-        Ok 0.
 
 
 let private buildinJunge : ProvidedFunction =
