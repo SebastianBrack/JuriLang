@@ -174,6 +174,12 @@ let openBracket =
 let closingBracket =
     pchar ']' .>> ws |> deferr "Es fehlt eine schließende Klammer"
     
+let private jskip =
+    pstring "skip" .>>. ws
+    
+let private jcry =
+    pstring "cry" .>>. ws
+    
     
     
 // expressions
@@ -533,6 +539,21 @@ let private returnStatement =
     |> singleLineStatementEnding
 
 
+
+let private skipStatement =
+    jskip
+    |>> (fun _ -> Skip)
+    |> singleLineStatementEnding
+
+
+
+let private cryStatement =
+    jcry >>. listExpression
+    |>> Cry
+    |> singleLineStatementEnding
+    
+
+
 instructionImpl.Value <-
     [
         binaryOperatorDefinition
@@ -546,7 +567,9 @@ instructionImpl.Value <-
         listElementAssignment 
         listIteration
         breakStatement 
-        returnStatement 
+        returnStatement
+        skipStatement
+        cryStatement
         instructionExpression
     ]
     |> choice
