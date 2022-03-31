@@ -35,7 +35,8 @@ type Instruction =
     | ListElementAssignment of  listName: Identifier * index: Expression * value: Expression
     | FunctionDefinition of functionName: Identifier * arguments: Parameter list * functionBody: JuriProgram
     | Loop of condition: Expression * repeat: bool * loopBody: JuriProgram
-    | Iteration of list: ListExpression * elementName: Identifier * loopBody: JuriProgram
+    | ListIteration of list: ListExpression * elementName: Identifier * loopBody: JuriProgram
+    | Iteration of times: Expression * loopBody: JuriProgram
     | OperatorDefinition of operator: BinaryOperator * leftArg: Parameter * rightArg: Parameter * functionBody: JuriProgram
     | Break
     | Return of Expression

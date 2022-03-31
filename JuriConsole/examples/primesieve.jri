@@ -2,7 +2,7 @@
 # Es nutzt als Strategie das "Sieb des Eratosthenes"
 
 
-:primes = [0 to 1000000]
+:primes = 0 to 1000000
 0:primes = 0
 1:primes = 0
 
@@ -13,5 +13,4 @@ iterate :primes as p
         if notPrime < ?:primes repeat
             notPrime:primes = 0
             notPrime = notPrime + p
-
-printn(p)
+        printn p

@@ -115,15 +115,15 @@ let operatorProduct =
     operator |> satisfies isProductOperator
 
 let private operatorNot =
-    pstring "not" .>> ws
+    pstring "not " .>> ws
     |>> BinaryOperator
     
 let private operatorAnd =
-    pstring "and" .>> ws
+    pstring "and " .>> ws
     |>> BinaryOperator
     
 let private operatorOr =
-    pstring "or" .>> ws
+    pstring "or " .>> ws
     |>> BinaryOperator
 
 
@@ -146,6 +146,9 @@ let jreturn =
     
 let iterate =
     pstring "iterate" .>> ws
+
+let jtimes =
+    pstring "times" .>> ws
     
 let jas =
     pstring "as" .>> ws
@@ -468,21 +471,32 @@ let private listElementAssignment =
     .>> eq
     .>>. (expression |> failAsFatal)
     |>> fun ((index, id), exp) -> ListElementAssignment (id, index, exp)
-    |> singleLineStatementEnding
+    |> singleLineStatementEnding 
 
 
 
 let private listIteration =
     iterate
-    >>. (listExpression |> failAsFatal)
+    >>. listExpression
     .>> (jas |> failAsFatal)
     .>>. identifier
     ||>> addThisLineToResult
     .>> newline .>> emptyLines
     .>>. (codeblock |> failAsFatal)
-    |>> fun (((listName, elementName), line), body) -> (Iteration (listName, elementName, body)), line
+    |>> fun (((list, elementName), line), body) -> (ListIteration (list, elementName, body)), line
+ 
+
+
+let private iteration =
+    iterate
+    >>. expression
+    .>> (jtimes |> failAsFatal)
+    ||>> addThisLineToResult
+    .>> newline .>> emptyLines
+    .>>. (codeblock |> failAsFatal)
+    |>> fun ((repetitions, line), body) -> (Iteration (repetitions, body)), line
     
-    
+
 
 let private functionDefinition =
     jfun
@@ -570,6 +584,7 @@ instructionImpl.Value <-
         listInitialisationWithValue 
         listElementAssignment 
         listIteration
+        iteration
         breakStatement 
         returnStatement
         skipStatement
