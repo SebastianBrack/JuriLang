@@ -1,4 +1,5 @@
 helloworld.jri
+fibonacci.jri
 fizzbuzz.jri
 basicarraymodification.jri
 binarysearch.jri
