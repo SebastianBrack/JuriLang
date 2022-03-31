@@ -192,9 +192,8 @@ let private listLiteral =
     |>> LiteralList
 
 let private range =
-    openBracket >>. expression .>> rangeOperator
+    expression .>> rangeOperator
     .>>. (expression |> failAsFatal)
-    .>> (closingBracket |> failAsFatal)
     |>> Range
 
 let private charList =
