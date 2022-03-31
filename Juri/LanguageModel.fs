@@ -39,5 +39,7 @@ type Instruction =
     | OperatorDefinition of operator: BinaryOperator * leftArg: Parameter * rightArg: Parameter * functionBody: JuriProgram
     | Break
     | Return of Expression
+    | Skip
+    | Cry of message: ListExpression
 
 and JuriProgram = (Instruction * int) list

@@ -40,12 +40,14 @@ and Environment =
 and ComputationState =
     {
         LastExpression : float option
+        SkipFlag : bool
         BreakFlag : bool
         ReturnFlag : bool
         Environment : Environment
     }
     static member Default = {
         LastExpression = None
+        SkipFlag = false
         BreakFlag = false
         ReturnFlag = false
         Environment = Map.empty }

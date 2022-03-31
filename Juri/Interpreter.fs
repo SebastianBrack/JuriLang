@@ -1,17 +1,15 @@
 module Juri.Internal.Interpreter
 
-open System
 open Juri.Internal.LanguageModel
 open Juri.Internal.OutputWriter
 open Juri.Internal.Runtime
-open Runtime
 
 
 
 // helper functions
 let private prependToList xs x = x::xs
 let private appendToList xs x = xs@[x]
-let private dropResults xs x = ()
+let private dropResults _ _ = ()
 
 let private accumulateResults accumulationStrategy results elem =
     match results, elem with
@@ -62,6 +60,8 @@ let rec private computeLoop
             | Error e -> Error e
             | Ok nextState when nextState.ReturnFlag = true -> Ok nextState
             | Ok nextState when nextState.BreakFlag = true -> Ok {nextState with BreakFlag = false}
+            | Ok nextState when nextState.SkipFlag = true ->
+                 computeLoop con rep body outputWriter {nextState with SkipFlag = false}
             | Ok nextState -> computeLoop con rep body outputWriter nextState
     | Ok _ -> (compute body outputWriter state)
 
@@ -160,11 +160,7 @@ and private computeListInitialisationWithCode
                     generationError
                 else
                     let newEnv = env |> Map.add listName (List newList)
-                    Ok {
-                        LastExpression = None
-                        Environment = newEnv
-                        BreakFlag = false
-                        ReturnFlag = false }
+                    Ok { ComputationState.Default with Environment = newEnv }
         | Error msg -> Error msg
     | _ -> Error $"{id} ist keine Liste und kann keine entsprechenden Werte zugewiesen bekommen."
     
@@ -217,9 +213,27 @@ and private computeListIteration
             | Error e -> Error e
             | Ok nextState when nextState.ReturnFlag = true -> Ok nextState
             | Ok nextState when nextState.BreakFlag = true -> Ok {nextState with BreakFlag = false}
-            | Ok newState -> iterate newState (pos+1) xs
+            | Ok nextState when nextState.SkipFlag = true ->
+                 iterate {nextState with SkipFlag = false} (pos+1) xs
+            | Ok nextState -> iterate nextState (pos+1) xs
     evalListExpression outputWriter state listExpression
     >>= iterate state 0
+    
+    
+and computeCry
+        (message : ListExpression)
+        (outputWriter: IOutputWriter)
+        (state: ComputationState) : InterpreterResult<ComputationState> =
+    
+    match evalListExpression outputWriter state message with
+    | Ok cs ->
+        let messageString =
+            cs |> Array.map (int >> char)
+            |> System.String.Concat
+        Error messageString
+    | Error msg ->
+        Error $"Beim Auswerten der Fehlermeldung ist ein Fehler aufgetreten.\n{msg}\n\nAnscheinend kannst du nicht mal rumheulen wie ein normaler Mensch!"
+        
 
 
 and compute
@@ -229,18 +243,17 @@ and compute
     
     match program with
     | [] -> Ok state
-    | _ when state.BreakFlag || state.ReturnFlag -> Ok state
+    | _ when state.BreakFlag || state.ReturnFlag || state.SkipFlag -> Ok state
     | (instruction, line) :: tail ->
-        let mutable discardTail = false
         let computationResult =
             match instruction with
+            | Skip ->
+                Ok {state with SkipFlag = true}
             | Break ->
-                discardTail <- true
                 Ok {state with BreakFlag = true}
             | Return exp ->
                 match eval outputWriter state exp with
                 | Ok x ->
-                    discardTail <- true
                     Ok {state with ReturnFlag = true; LastExpression = Some x}
                 | Error e ->
                     Error e
@@ -266,6 +279,8 @@ and compute
                 computeListElementAssignment (identifier, indexExpression, valueExpression) outputWriter state
             | Iteration(listExpression, elementName, loopBody) ->
                 computeListIteration (listExpression, elementName, loopBody) outputWriter state
+            | Cry message ->
+                computeCry message outputWriter state
         
         match computationResult with
         | Ok newState -> compute tail outputWriter newState
@@ -410,11 +425,7 @@ and private evalCustomFunction
             let scopedVariables = args |> List.zip parameterNames
             let scopedFunctions = env |> Map.filter functionFilter |> Map.toList
             let functionEnv = Map (scopedVariables @ scopedFunctions)
-            let functionComputationState = {
-                LastExpression = None
-                Environment = functionEnv
-                BreakFlag = false
-                ReturnFlag = false }
+            let functionComputationState = { ComputationState.Default with Environment = functionEnv }
             let returnValue = compute body outputWriter functionComputationState
             match returnValue with
             | Error e -> Error e
@@ -443,5 +454,5 @@ and private evalListExpression
         | _, Error msg -> Error msg
     | LiteralList expressions ->
         evalList outputWriter state expressions
-        |> Runtime.map List.toArray
+        |> map List.toArray
         
