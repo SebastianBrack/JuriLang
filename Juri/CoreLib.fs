@@ -27,7 +27,7 @@ let private buildinInBoundarys : ProvidedFunction =
         | [a;b]   -> if a < b then Ok 1. else Ok 0.
         | [a;b;c] -> if a <= b && b < c then Ok 1. else Ok 0.
         | _       -> Error (sprintf "Diese Funktion erwartet 2 oder 3 Argumente - es wurden aber %i übergeben." args.Length)
-
+        
 let private buildinPrint : ProvidedFunction =
     fun out args ->
         args
@@ -149,7 +149,16 @@ let private buildinTime : ProvidedFunction =
         match args with
         | [] -> DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds() |> float |> Ok
         | _  -> Error (sprintf "Diese Funktion erwartet 0 Argumente - es wurden aber %i übergeben." args.Length)
-        
+
+let private buildinAssert : ProvidedFunction =
+    fun _ args ->
+        match args with
+        | [] ->  Error (sprintf "Diese Funktion erwartet 1 oder mehr Argumente - es wurden aber %i übergeben." args.Length)
+        | a -> 
+            match List.contains 0. args with
+            | true ->   Error (sprintf "Assert ist fehlgeschlagen %A" args)
+            | false ->  Ok 1.
+
 let private buildinQuickMath : ProvidedFunction =
     let test x =
         if x <= 20 then "+"
@@ -311,6 +320,7 @@ let createEnvWithCoreLibFunctions () : Environment =
         (Identifier "round", ProvidedFunction buildinRound)
         (Identifier "PI", ProvidedFunction buildinPI)
         (Identifier "time", ProvidedFunction buildinTime)
+        (Identifier "assert", ProvidedFunction buildinAssert)
         (Identifier "+", ProvidedFunction plus)
         (Identifier "-", ProvidedFunction minus)
         (Identifier "*", ProvidedFunction star)
