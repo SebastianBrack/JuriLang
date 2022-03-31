@@ -197,9 +197,16 @@ let private range =
     .>> (closingBracket |> failAsFatal)
     |>> Range
 
+let private charList =
+    pchar '''
+    >>. many (anyBut (set [''']))
+    .>> pchar '''
+    |>> (fun cs -> cs |> List.map (int >> float >> LiteralNumber) |> LiteralList)
+
 let private listExpression =
     [ range
       listLiteral
+      charList
       listReference ]
     |> choice
 
@@ -416,17 +423,8 @@ let private assignment =
 let private listAssignment =
     listIdentifier
     .>> eq
-    .>>. (openBracket >>. (many expression) .>> closingBracket)
+    .>>. listExpression
     |>> ListAssignment
-    |> singleLineStatementEnding
-    
-    
-    
-let private listAssignmentWithRange = // has to be tried before listAssignment in the parsing order
-    listIdentifier
-    .>> eq
-    .>>. (openBracket >>. expression .>> rangeOperator .>>. expression .>> closingBracket)
-    |>> fun (id, (lowerBound, upperBound)) -> ListAssignmentWithRange (id, lowerBound, upperBound)
     |> singleLineStatementEnding
     
     
@@ -543,7 +541,6 @@ instructionImpl.Value <-
         loop
         functionDefinition
         assignment 
-        listAssignmentWithRange 
         listAssignment 
         listInitialisationWithCode
         listInitialisationWithValue 
