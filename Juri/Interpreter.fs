@@ -384,12 +384,12 @@ and evalLogicalExpression
         (operation, left, right) : InterpreterResult<float> =
    
     match operation with
-    | "and" ->
+    | "and " ->
         match eval outputWriter state left with
         | Error msg -> Error msg
         | Ok 0. -> Ok 0. // if the left side of logical and is false we dont need to evaluate the right side
         | Ok _ -> eval outputWriter state right
-    | "or" ->
+    | "or " ->
         match eval outputWriter state left with
         | Error msg -> Error msg
         | Ok 0. -> eval outputWriter state right

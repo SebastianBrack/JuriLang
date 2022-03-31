@@ -295,7 +295,7 @@ let private pow : ProvidedFunction =
 
 let createEnvWithCoreLibFunctions () : Environment =
     Map [
-        (Identifier "not", ProvidedFunction buildinNot)
+        (Identifier "not ", ProvidedFunction buildinNot)
         (Identifier "add", ProvidedFunction buildinAdd)
         (Identifier "mul", ProvidedFunction buildinMul)
         (Identifier "sub", ProvidedFunction buildinSub)
