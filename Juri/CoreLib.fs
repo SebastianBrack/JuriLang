@@ -41,6 +41,23 @@ let private buildinPrint : ProvidedFunction =
         |> String.Concat
         |> out.WriteSTD
         Ok 0.
+
+let private buildinBier : ProvidedFunction =
+    fun out args ->
+        match args with
+        | [a] ->
+            out.WriteSTD $"NIMM VERDAMMT NOCHMAL DIE HÄNDE WEG VON MEINEM BIER DU FICKSCHNITZEL {a} SIND ZU VIEL JUUUNGE \n"
+            Ok 0.
+        | _   ->
+            Error (sprintf "Isch wollte ein Argumente Juunge - WAS WILLST DU MIT %i DU HUSO !?!?. Komm ma klar man" args.Length)
+        
+let private buildinJunge : ProvidedFunction =
+    fun out args ->
+        args
+        |> List.map (fun x -> $"{x} ")
+        |> String.Concat
+        |> out.WriteSTD
+        Ok 0.
         
 let private buildinPrintNewline : ProvidedFunction =
     let join separator a b = a + separator + b
@@ -91,7 +108,54 @@ let private buildinRandom : ProvidedFunction =
         | [a;b]   -> rand.Next(int a, int b) |> float |> Ok
         | _       -> Error (sprintf "Diese Funktion erwartet 1 oder 2 Argumente - es wurden aber %i übergeben." args.Length)
 
+let private buildinFactorial : ProvidedFunction =
+    fun _ args ->
+        let factorial n =
+            let rec loop i acc =
+                match i with
+                | 0 | 1 -> acc
+                | _ -> loop (i-1) (acc * i)
+            loop n 1
+        match args with
+        | [a]     -> factorial(int a) |> float |> Ok
+        | _       -> Error (sprintf "Diese Funktion erwartet 1 Argument - es wurden aber %i übergeben." args.Length)
 
+let private buildinSqrt : ProvidedFunction =
+    fun _ args ->
+        match args with
+        | [a]     -> sqrt a |> float |> Ok
+        | _       -> Error (sprintf "Diese Funktion erwartet 1 Argument - es wurden aber %i übergeben." args.Length)
+
+let private buildinFloor : ProvidedFunction =
+    fun _ args ->
+        match args with
+        | [a]     -> floor a |> float |> Ok
+        | _       -> Error (sprintf "Diese Funktion erwartet 1 Argument - es wurden aber %i übergeben." args.Length)
+
+let private buildinCeil : ProvidedFunction =
+    fun _ args ->
+        match args with
+        | [a]     -> ceil a |> float |> Ok
+        | _       -> Error (sprintf "Diese Funktion erwartet 1 Argument - es wurden aber %i übergeben." args.Length)
+
+let private buildinRound : ProvidedFunction =
+    fun _ args ->
+        match args with
+        | [a]     -> round a |> float |> Ok
+        | _       -> Error (sprintf "Diese Funktion erwartet 1 Argument - es wurden aber %i übergeben." args.Length)
+
+let private buildinPI : ProvidedFunction =
+    fun _ args ->
+        match args with
+        | []     -> Math.PI |> float |> Ok
+        | _       -> Error (sprintf "Diese Funktion erwartet 1 Argument - es wurden aber %i übergeben." args.Length)
+
+let private buildinTime : ProvidedFunction =
+    fun _ args ->
+        match args with
+        | [] -> DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds() |> float |> Ok
+        | _  -> Error (sprintf "Diese Funktion erwartet 0 Argumente - es wurden aber %i übergeben." args.Length)
+        
 let private buildinQuickMath : ProvidedFunction =
     let test x =
         if x <= 20 then "+"
@@ -118,7 +182,6 @@ let private buildinQuickMath : ProvidedFunction =
             | "**"-> a ** b |> float |> Ok
             | _ -> Error (sprintf "Du bist ein Otto")
         | _     -> Error (sprintf "Diese Funktion erwartet 2 Argumente - es wurden aber %i übergeben." args.Length)
-
 
 let private argError n = Error (sprintf "Diese Funktion erwartet 2 Argumente - es wurden aber %i übergeben" n)
 
@@ -243,9 +306,18 @@ let createEnvWithCoreLibFunctions () : Environment =
         (Identifier "printn", ProvidedFunction buildinPrintNewline)
         (Identifier "printc", ProvidedFunction buildinPrintChar)
         (Identifier "printcn", ProvidedFunction buildinPrintCharNewline)
+        (Identifier "juuunge", ProvidedFunction buildinJunge)
+        (Identifier "bier", ProvidedFunction buildinBier)
         (Identifier "input", ProvidedFunction buildinInput)
         (Identifier "rand", ProvidedFunction buildinRandom)
+        (Identifier "sqrt", ProvidedFunction buildinSqrt)
         (Identifier "quickmath", ProvidedFunction buildinQuickMath)
+        (Identifier "factorial", ProvidedFunction buildinFactorial)
+        (Identifier "floor", ProvidedFunction buildinFloor)
+        (Identifier "ceil", ProvidedFunction buildinCeil)
+        (Identifier "round", ProvidedFunction buildinRound)
+        (Identifier "PI", ProvidedFunction buildinPI)
+        (Identifier "time", ProvidedFunction buildinTime)
         (Identifier "+", ProvidedFunction plus)
         (Identifier "-", ProvidedFunction minus)
         (Identifier "*", ProvidedFunction star)
