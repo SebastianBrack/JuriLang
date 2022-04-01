@@ -23,11 +23,9 @@ let private runScript (script: string) =
                 |> ignore
                 0
             | Failure (msg, _) ->
-                printfn $"{stream.GetContext()}"
                 outputWriter.WriteERR(msg, stream.GetContext().Line)
                 0
             | Fatal (msg, _) -> 
-                printfn $"{stream.GetContext()}"
                 outputWriter.WriteERR(msg, stream.GetContext().Line)
                 0
 
