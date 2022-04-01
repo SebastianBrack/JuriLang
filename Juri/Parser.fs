@@ -211,7 +211,8 @@ let private range =
 let private charList =
     pchar '''
     >>. many (anyBut (set [''']))
-    .>> pchar '''
+    .>> (pchar ''' |> failAsFatal)
+    >>. ws
     |>> (fun cs -> cs |> List.map (int >> float >> LiteralNumber) |> LiteralList)
 
 let private nakedListExpression =
@@ -318,8 +319,8 @@ singleExpressionImpl.Value <-
     [
         parenthesizedExpression
         logicalNegation
-        listAccess
         functionCall
+        listAccess
         variableReference
         listLength
         number
