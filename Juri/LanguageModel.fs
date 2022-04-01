@@ -5,7 +5,7 @@ type Identifier = Identifier of string
 type BinaryOperator = BinaryOperator of string
 type Expression =
     | LiteralNumber of float
-    | ListAccess of Identifier * Expression
+    | ListAccess of ListExpression * Expression
     | ListLength of Identifier
     | VariableReference of Identifier
     | FunctionCall of functionName: Identifier * parameter: GivenArgument list

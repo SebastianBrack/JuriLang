@@ -331,14 +331,8 @@ and private eval
         | Some (Variable x) -> Ok x
         | Some _ -> Error $"{id} ist keine Variable"
         | None -> Error $"Der Verweis auf %A{id} konnt nicht aufgelöst werden."
-    | ListAccess (id, indexExpression) ->
-        match (Map.tryFind id env) with
-        | Some (List xs) ->
-            eval outputWriter state indexExpression
-            >>= (int >> Ok)
-            >>= evalListAccess xs
-        | Some _ -> Error $"{id} ist keine Liste."
-        | None -> Error $"Die Liste {id} existiert nicht."
+    | ListAccess (listExpression, indexExpression) ->
+        evalListAccess outputWriter state indexExpression listExpression
     | ListLength id ->
         match (Map.tryFind id env) with
         | Some (List xs) -> Ok xs.Length
@@ -399,16 +393,25 @@ and evalLogicalExpression
 
 
 and private evalListAccess
-        (list: float array)
-        (index: int) : InterpreterResult<float> =
+        (outputWriter: IOutputWriter)
+        (state: ComputationState) 
+        (indexExpression: Expression)
+        (listExpression: ListExpression) : InterpreterResult<float> =
     
-    let trueIndex =
-        if index < 0
-            then list.Length + index
-            else index
-    if trueIndex >= 0 && trueIndex < list.Length
-        then Ok list[trueIndex]
-        else Error $"Der Index {index} liegt ausserhalb des Umfangs der Liste."
+    match eval outputWriter state indexExpression with
+    | Error msg -> Error $"Auswerten des Index fehlgeschlagen:\n{msg}"
+    | Ok i -> 
+        match evalListExpression outputWriter state listExpression with
+        | Error msg -> Error $"Erstellen des Arrays fehlgeschlagen:\n{msg}"
+        | Ok list ->
+            let index = int i
+            let trueIndex =
+                if index < 0
+                    then list.Length + index
+                    else index
+            if trueIndex >= 0 && trueIndex < list.Length
+                then Ok list[trueIndex]
+                else Error $"Der Index {index} liegt ausserhalb des Umfangs der Liste."
 
 
 and private evalList
