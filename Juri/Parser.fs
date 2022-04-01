@@ -275,11 +275,14 @@ let private listLength =
     
     
 let private listAccess =
+    let reference =
+        listIdentifier |>> ListReference
+    let other =
+        .>> pchar ':'
+        .>> ws
     (parenthesizedExpression <|> number <|> variableReference <|> functionCall <|> listLength)
     .>> ws
-    .>> lookAhead (pchar ':')
-    .>> ws
-    .>>. listExpression
+    .>>. either reference other
     |>> fun (index, id) -> ListAccess (id, index)
 
 
