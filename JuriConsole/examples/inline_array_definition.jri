@@ -1,10 +1,11 @@
 ﻿fun sniplist :arr low high
-    iterate [low to high] as i
-        print(i:arr)
-    printcn()    
+    if not low <= high then cry 'invalid bounds'
+    iterate low to high as i
+        print i:arr
+    printcn
         
-:nums = [0 to 100]      
+:nums = 0 to 100
 
-sniplist(:nums 2 5)
-sniplist([4 8 564 99  12154 54] 2 5)
-sniplist([222 to 333] 2 5)
+sniplist :nums 2 5
+sniplist [4 8 564 99  12154 54] 2 5
+sniplist 222 to 333   2 5

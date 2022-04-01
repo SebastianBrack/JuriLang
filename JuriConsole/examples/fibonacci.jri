@@ -6,7 +6,7 @@
 fun fib nth
     last = 1
     this = 0
-    iterate 1 to nth as _
+    iterate nth times
         temp = this
         this = last + this
         last = temp
