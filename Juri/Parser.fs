@@ -71,7 +71,7 @@ let private listIdentifier =
 
     identifierStart .>>. identifier
     .>> ws
-    |>> fun (c, cs) -> c :: cs |> String.Concat |> Identifier
+    |>> fun (c, Identifier cs) -> c :: cs |> String.Concat |> Identifier
     |> deferr "Es wurde ein ListIdentifier erwartet."
 
 
