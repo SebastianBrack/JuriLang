@@ -69,11 +69,7 @@ let private listIdentifier =
 
     let identifierStart = pchar ':' 
 
-    let identifierTail =
-        '_' :: ['a'..'z'] @ ['A'..'Z'] @ ['0'..'9']
-        |> Set |> anyOf
-
-    identifierStart .>>. (many identifierTail)
+    identifierStart .>>. identifier
     .>> ws
     |>> fun (c, cs) -> c :: cs |> String.Concat |> Identifier
     |> deferr "Es wurde ein ListIdentifier erwartet."
@@ -325,13 +321,13 @@ let private logicalSum =
 
 singleExpressionImpl.Value <-
     [
-        parenthesizedExpression
         logicalNegation
         functionCall
         listAccess
         variableReference
         listLength
         number
+        parenthesizedExpression
     ]
     |> choice
     
