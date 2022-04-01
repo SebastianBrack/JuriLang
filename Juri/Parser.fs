@@ -212,7 +212,7 @@ let private charList =
     pchar '''
     >>. many (anyBut (set [''']))
     .>> (pchar ''' |> failAsFatal)
-    >>. ws
+    .>> ws
     |>> (fun cs -> cs |> List.map (int >> float >> LiteralNumber) |> LiteralList)
 
 let private nakedListExpression =
