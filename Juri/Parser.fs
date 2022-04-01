@@ -276,7 +276,7 @@ let private listLength =
     
 let private listAccess =
     (parenthesizedExpression <|> number <|> variableReference <|> functionCall <|> listLength)
-    .>> optional pchar ':'
+    .>> optional (pchar ':')
     .>> ws
     .>>. listExpression
     |>> fun (index, id) -> ListAccess (id, index)
