@@ -278,8 +278,9 @@ let private listAccess =
     let reference =
         listIdentifier |>> ListReference
     let other =
-        .>> pchar ':'
+        pchar ':'
         .>> ws
+        >>. listExpression
     (parenthesizedExpression <|> number <|> variableReference <|> functionCall <|> listLength)
     .>> ws
     .>>. either reference other
