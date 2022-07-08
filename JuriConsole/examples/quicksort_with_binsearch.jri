@@ -34,10 +34,10 @@ fun quick_sort :array start end
      
     if (start < end)
        
-        p = partition(:array start end )
+        p = partition :array start end 
          
-        quick_sort(:array start p-1)
-        quick_sort(:array p+1 end )
+        quick_sort :array start p-1
+        quick_sort :array p+1 end
     1
 
 
@@ -51,10 +51,10 @@ fun binary_search :arr low high x
             return mid
         
         if mid:arr > x
-            return binary_search(:arr low mid-1 x)
+            return binary_search :arr low mid-1 x
  
         if mid:arr <= x
-            return binary_search(:arr mid+1 high x)
+            return binary_search :arr mid+1 high x
  
     
     return -1
@@ -63,17 +63,17 @@ fun binary_search :arr low high x
 fun main m
     
     :array = init 1000 as _
-        rand(1 1000)
+        rand 1 1000 
         
-    quick_sort(:array 0 (?:array-1))
+    quick_sort :array 0 (?:array-1)
 
-    x = rand(1 1000) 
-    index_of_result = binary_search(:array 0 (?:array)-1 x)
+    x = rand 1 1000
+    index_of_result = binary_search :array 0 (?:array)-1 x
     
     # index_of_result is -1 if the number wasnt found
-    print(index_of_result)
+    print index_of_result 
 
     m 
 
 
-main(1)
+main 1 
