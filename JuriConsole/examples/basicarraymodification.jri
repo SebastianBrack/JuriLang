@@ -1,4 +1,4 @@
-:l = [1 to 10]
+:l = 1 to 10
 
 fun map :o
     i=0
@@ -7,9 +7,12 @@ fun map :o
         i=i+1
     1
 
-map(:l)
+map :l
 
 iterate :l as i
-    print(i)
-    
-# output :  69 69 69 69 69 69 69 69 69 69 
+    print i
+
+printcn
+printc 110 105 99 101 
+
+# output :  69 69 69 69 69 69 69 69 69 69
