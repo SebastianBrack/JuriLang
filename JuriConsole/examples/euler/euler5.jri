@@ -10,8 +10,8 @@ fun compute c
     ans = 1
     i=1
     if i < 21 repeat
-        ans = ans * (i // gcd(i ans))
+        ans = ans * (i // gcd i ans)
         i=i+1
     return ans
      
-print(compute(1))
+print compute 1
