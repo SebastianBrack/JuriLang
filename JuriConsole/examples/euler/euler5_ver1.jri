@@ -7,8 +7,8 @@ fun gcd x y
 
 fun compute c
     ans = 1
-    iterate [1 to 20] as i
-        ans = ans * (i // gcd(i ans))
+    iterate 1 to 20 as i
+        ans = ans * (i // gcd i ans)
     ans
      
-print(compute(1))
+print compute 1
