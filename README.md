@@ -1,5 +1,5 @@
 # juri lang
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://github.com/SebastianBrack/JuriLang) 
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://www.gitpod.io/#https://github.com/SebastianBrack/JuriLang) 
 # List of all keywords
 
 >Online interpreter with text editor and syntax highlighting on Heroku
