@@ -8,16 +8,16 @@ fun binary_search :arr low high x
             return mid
         
         if mid:arr > x
-            return binary_search(:arr low mid-1 x)
+            return binary_search :arr low mid-1 x
  
         if mid:arr <= x
-            return binary_search(:arr mid+1 high x)
+            return binary_search :arr mid+1 high x
  
     
     return -1
 
-:arr = [0 to 100]
+:arr = 0 to 100
 x = 11 
-result = binary_search(:arr 0 (?:arr)-1 x)
+result = binary_search :arr 0 (?:arr)-1 x
 
-print(result)
+print result
