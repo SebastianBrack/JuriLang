@@ -1,11 +1,11 @@
-# print function to print a list as a sequence of ascii characters
+# print string function
 fun prints :string
     iterate :string as char
         printc char
 
-:hello_world = [72 101 108 108 111 32 87 111 114 108 100 33]
+:hello_world = 'Hello World! This is an example program, written in the language juri.'
 
-iterate 0 to 100 as _
+iterate 100 times
     prints :hello_world
     printcn
     # swap a random char with a space
